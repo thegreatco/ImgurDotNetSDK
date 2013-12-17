@@ -159,6 +159,15 @@ namespace ImgurDotNetSDK
             return image;
         }
 
+        public async Task<ImgurImage> GetImage(ImgurGallery gallery)
+        {
+            if (gallery.IsAlbum) return null;
+
+            var image = new ImgurImage { Id = gallery.Id, Timestamp = gallery.Timestamp, RawImage = await GetImage(gallery.Link) };
+
+            return image;
+        }
+
         private async Task<T> Get<T>(string requestUrl, HttpContent postData = null) where T : class
         {
             return await Get<T>(new UriBuilder(requestUrl).Uri, postData);

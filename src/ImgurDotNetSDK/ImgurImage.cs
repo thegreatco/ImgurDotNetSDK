@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using System.IO;
 
 namespace ImgurDotNetSDK
@@ -11,7 +12,7 @@ namespace ImgurDotNetSDK
 
         public string Description { get; set; }
 
-        public string Timestamp { get; set; }
+        public DateTime Timestamp { get; set; }
 
         public string Type { get; set; }
 
