@@ -39,7 +39,12 @@ namespace ImgurDotNetSDK
             _settings = settings;
 
             Mapper.CreateMap<ImageEntity, ImgurImage>();
-            Mapper.CreateMap<GalleryEntity, ImgurGallery>();
+            Mapper.CreateMap<GalleryEntity, ImgurGallery>()
+                .ForMember(x => x.Timestamp, y => y.ResolveUsing(x =>
+                {
+                    var epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+                    return epoch.AddSeconds(x.Timestamp);
+                }));
         }
 
         /// <summary>
@@ -119,27 +124,39 @@ namespace ImgurDotNetSDK
         /// Get a gallery based on an <see cref="ImgurGallery"/> returned by a gallery listing page, like the homepage.
         /// </summary>
         /// <param name="gallery"> The <see cref="ImgurGallery"/> to retrieve. </param>
+        /// <param name="autodownload"> Autodownload images for the gallery, if set to false, a subsequent call to GetImage will need to be made. </param>
         /// <returns> The full gallery from Imgur. </returns>
-        public async Task<ImgurGallery> GetGallery(ImgurGallery gallery)
+        public async Task<ImgurGallery> GetGallery(ImgurGallery gallery, bool autodownload = true)
         {
-            return await GetGallery(gallery.Url);
+            return await GetGallery(gallery.Url, autodownload);
         }
 
         /// <summary>
         /// Get a gallery base on a <see cref="Uri"/>.
         /// </summary>
         /// <param name="galleryUrl"> The <see cref="Uri"/> of the <see cref="ImgurGallery"/> to retrieve. </param>
+        /// <param name="autodownload"> Autodownload images for the gallery, if set to false, a subsequent call to GetImage will need to be made. </param>
         /// <returns> The full gallery from Imgur.</returns>
-        public async Task<ImgurGallery> GetGallery(Uri galleryUrl)
+        public async Task<ImgurGallery> GetGallery(Uri galleryUrl, bool autodownload = true)
         {
             var dtoGallery = await Get<GalleryResponse>(galleryUrl);
             var gallery = dtoGallery.Data.Select(Mapper.Map<GalleryEntity, ImgurGallery>).First();
-            foreach (var image in gallery.Images)
-            {
-                image.Image = await GetImage(image.Link);
-            }
-
+            if (autodownload)
+                foreach (var image in gallery.Images)
+                    image.RawImage = await GetImage(image.Link);
+            
             return gallery;
+        }
+
+        /// <summary>
+        /// Download the image associated with the <see cref="ImgurImage"/>.
+        /// </summary>
+        /// <param name="image"> The <see cref="ImgurImage"/> object for which to download the image. </param>
+        /// <returns> The <see cref="ImgurImage"/> with the full image data. </returns>
+        public async Task<ImgurImage> GetImage(ImgurImage image)
+        {
+            image.RawImage = await GetImage(image.Link);
+            return image;
         }
 
         private async Task<T> Get<T>(string requestUrl, HttpContent postData = null) where T : class

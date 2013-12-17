@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using System.IO;
 
 namespace ImgurDotNetSDK
 {
@@ -28,6 +29,15 @@ namespace ImgurDotNetSDK
 
         public string Link { get; set; }
 
-        public byte[] Image { get; set; }
+        public byte[] RawImage { get; set; }
+
+        public Image Image
+        {
+            get
+            {
+                using (var ms = new MemoryStream(RawImage))
+                    return Image.FromStream(ms);
+            }
+        }
     }
 }

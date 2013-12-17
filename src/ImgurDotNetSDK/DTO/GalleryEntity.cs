@@ -19,7 +19,7 @@ namespace ImgurDotNetSDK.DTO
         public string Description { get; set; }
 
         [DataMember(Name = "datetime")]
-        public string Timestamp { get; set; }
+        public long Timestamp { get; set; }
 
         [DataMember(Name = "cover")]
         public string Cover { get; set; }

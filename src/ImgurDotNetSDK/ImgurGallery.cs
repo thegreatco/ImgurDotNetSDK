@@ -14,7 +14,7 @@ namespace ImgurDotNetSDK
 
         public string Description { get; set; }
 
-        public string Timestamp { get; set; }
+        public DateTime Timestamp { get; set; }
 
         public string Cover { get; set; }
 
