@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Text;
+﻿using System.Drawing;
 
 namespace ImgurDotNetSDK
 {
@@ -31,5 +27,7 @@ namespace ImgurDotNetSDK
         public long Bandwidth { get; set; }
 
         public string Link { get; set; }
+
+        public byte[] Image { get; set; }
     }
 }

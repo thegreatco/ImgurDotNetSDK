@@ -44,7 +44,7 @@ namespace ImgurDotNetSDK
 
         public Uri Url
         {
-            get { return IsAlbum ? new UriBuilder(ImgurClient.AlbumUrl.With(Id)).Uri : null; }
+            get { return IsAlbum ? new UriBuilder("https://api.imgur.com/3/gallery/album/{0}.json".With(Id)).Uri : null; }
         }
     }
 }

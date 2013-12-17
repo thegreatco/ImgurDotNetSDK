@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.IO;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.Threading.Tasks;
 using AutoMapper;
 using ImgurDotNet;
-using ImgurDotNetSDK;
 using ImgurDotNetSDK.DTO;
 using ImgurDotNetSDK.Extensions;
 using ServiceStack.Text;
@@ -19,11 +16,6 @@ namespace ImgurDotNetSDK
     public class ImgurClient
     {
         private const string TokenRequestUrl = "https://api.imgur.com/oauth2/token";
-        private const string UploadUrl = "https://api.imgur.com/3/upload.json";
-        private const string StatsUrl = "https://api.imgur.com/3/stats.json?view={0}";
-        internal const string AlbumUrl = "https://api.imgur.com/3/album/{0}.json";
-        private const string ImageUrl = "https://api.imgur.com/3/image/{0}.json";
-        private const string DeleteUrl = "https://api.imgur.com/3/delete/{0}.json";
         
         /// <summary>
         /// {0} - GalleryType enum
@@ -141,23 +133,18 @@ namespace ImgurDotNetSDK
         public async Task<ImgurGallery> GetGallery(Uri galleryUrl)
         {
             var dtoGallery = await Get<GalleryResponse>(galleryUrl);
-            return dtoGallery.Data.Select(Mapper.Map<GalleryEntity, ImgurGallery>).First();
-        }
-
-        private static string EscapeBase64(string str)
-        {
-            var escaped = string.Empty;
-            for (var i = 0; i < str.Length; i ++)
+            var gallery = dtoGallery.Data.Select(Mapper.Map<GalleryEntity, ImgurGallery>).First();
+            foreach (var image in gallery.Images)
             {
-                escaped += Uri.EscapeDataString(str.Substring(i, 1));
+                image.Image = await GetImage(image.Link);
             }
 
-            return escaped;
+            return gallery;
         }
 
-        private async Task<T> Get<T>(string request, HttpContent postData = null) where T : class
+        private async Task<T> Get<T>(string requestUrl, HttpContent postData = null) where T : class
         {
-            return await Get<T>(new UriBuilder(request).Uri, postData);
+            return await Get<T>(new UriBuilder(requestUrl).Uri, postData);
         }
 
         private async Task<T> Get<T>(Uri requestUri, HttpContent postData = null, int retryCount = 0) where T : class
@@ -177,8 +164,45 @@ namespace ImgurDotNetSDK
                     switch (statusCode)
                     {
                         case HttpStatusCode.Forbidden:
+                        case HttpStatusCode.Unauthorized:
                             await RefreshLogin();
                             return await Get<T>(requestUri, postData, retryCount + 1);
+                        case HttpStatusCode.MethodNotAllowed:
+                        case HttpStatusCode.BadGateway:
+                            throw new ImgurDownException("Imgur is down, try the request again later.");
+                        default:
+                            Console.WriteLine(statusCode);
+                            Console.WriteLine(response.Content.ReadAsStringAsync().Result);
+                            throw new Exception("Unexpected HttpStatusCode encountered.");
+                    }
+                }
+            }
+        }
+
+        private async Task<byte[]> GetImage(string requestUrl)
+        {
+            return await GetImage(new UriBuilder(requestUrl).Uri);
+        }
+
+        private async Task<byte[]> GetImage(Uri requestUri, int retryCount = 0)
+        {
+            if (retryCount > 5) throw new Exception("Retry count exceeded.");
+
+            using (var request = new HttpRequestMessage(HttpMethod.Get, requestUri))
+            {
+                if (_credentials != null)
+                    request.Headers.TryAddWithoutValidation("Authorization", "Bearer " + _credentials.AccessToken);
+                using (var response = await StaticHttpClient.Client.SendAsync(request))
+                {
+                    if (response.IsSuccessStatusCode)
+                        return await response.Content.ReadAsByteArrayAsync();
+                    var statusCode = response.StatusCode;
+                    switch (statusCode)
+                    {
+                        case HttpStatusCode.Forbidden:
+                        case HttpStatusCode.Unauthorized:
+                            await RefreshLogin();
+                            return await GetImage(requestUri, retryCount + 1);
                         case HttpStatusCode.MethodNotAllowed:
                         case HttpStatusCode.BadGateway:
                             throw new ImgurDownException("Imgur is down, try the request again later.");

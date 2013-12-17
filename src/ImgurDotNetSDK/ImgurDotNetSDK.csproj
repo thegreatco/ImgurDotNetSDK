@@ -94,6 +94,8 @@
     <Compile Include="DTO\ImgurBaseResponse.cs" />
     <Compile Include="DTO\ImageEntity.cs" />
     <Compile Include="DTO\LoginResponse.cs" />
+    <Compile Include="Exceptions\ImgurException.cs" />
+    <Compile Include="Exceptions\UnauthorizedException.cs" />
     <Compile Include="Exceptions\ImgurDownException.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="GalleryType.cs" />

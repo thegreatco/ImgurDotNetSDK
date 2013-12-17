@@ -2,9 +2,10 @@
 
 namespace ImgurDotNetSDK
 {
-    public class ImgurDownException : Exception
+    public class ImgurDownException : ImgurException
     {
-        public ImgurDownException(string message) : base(message)
+        public ImgurDownException(string message)
+            : base(message)
         {
         }
     }
