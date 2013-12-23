@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Text;
+﻿using System.Runtime.Serialization;
 
 namespace ImgurDotNetSDK.DTO
 {
@@ -19,7 +15,7 @@ namespace ImgurDotNetSDK.DTO
         public string Description { get; set; }
 
         [DataMember(Name = "datetime")]
-        public string Timestamp { get; set; }
+        public long Timestamp { get; set; }
 
         [DataMember(Name = "type")]
         public string Type { get; set; }
@@ -41,6 +37,12 @@ namespace ImgurDotNetSDK.DTO
 
         [DataMember(Name = "bandwidth")]
         public long Bandwidth { get; set; }
+
+        [DataMember(Name = "deletehash")]
+        public string DeleteHash { get; set; }
+
+        [DataMember(Name = "section")]
+        public string Section { get; set; }
 
         [DataMember(Name = "link")]
         public string Link { get; set; }

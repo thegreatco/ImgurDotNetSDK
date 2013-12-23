@@ -21,5 +21,10 @@ namespace ImgurDotNetSDK.Extensions
         {
             return string.Format(@string, args);
         }
+
+        public static Uri ToUri(this string @string, params object[] args)
+        {
+            return new UriBuilder(@string.With(args)).Uri;
+        }
     }
 }

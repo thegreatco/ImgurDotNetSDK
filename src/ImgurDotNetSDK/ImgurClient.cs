@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using ImgurDotNet;
@@ -13,7 +14,7 @@ using ServiceStack.Text;
 
 namespace ImgurDotNetSDK
 {
-    public class ImgurClient
+    public partial class ImgurClient
     {
         private const string TokenRequestUrl = "https://api.imgur.com/oauth2/token";
         
@@ -38,13 +39,20 @@ namespace ImgurDotNetSDK
             if (settings == null) throw new ArgumentNullException("settings", "Settings cannot be null.");
             _settings = settings;
 
-            Mapper.CreateMap<ImageEntity, ImgurImage>();
+            Mapper.CreateMap<ImageEntity, ImgurImage>()
+                .ForMember(x => x.Timestamp, y => y.ResolveUsing(x => x.Timestamp.FromUnixTime()));
+            Mapper.CreateMap<ImagesResponse, ImgurImages>().ForMember(x => x.Images, y => y.MapFrom(x => x.Data));
             Mapper.CreateMap<GalleryEntity, ImgurGallery>()
-                .ForMember(x => x.Timestamp, y => y.ResolveUsing(x =>
-                {
-                    var epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-                    return epoch.AddSeconds(x.Timestamp);
-                }));
+                .ForMember(x => x.Timestamp, y => y.ResolveUsing(x => x.Timestamp.FromUnixTime()));
+            Mapper.CreateMap<AccountResponse, ImgurAccount>()
+                .ForMember(x => x.Created, y => y.ResolveUsing(x => x.Created.FromUnixTime()))
+                .ForMember(x => x.ProExpiration, y => y.ResolveUsing(x =>
+                                                                     {
+                                                                         if (x.ProExpiration == "false") return null;
+                                                                         return long.Parse(x.ProExpiration).FromUnixTime();
+                                                                     }));
+            Mapper.CreateMap<BasicResponse, ImgurBasic>()
+                .ForMember(x => x.Status, y => y.ResolveUsing(x => (HttpStatusCode) x.Status));
         }
 
         /// <summary>
@@ -82,7 +90,7 @@ namespace ImgurDotNetSDK
                                                                 new KeyValuePair<string, string>("grant_type", "pin"),
                                                                 new KeyValuePair<string, string>("pin", pin)
                                                             });
-            var response = await Get<LoginResponse>(TokenRequestUrl, postContent);
+            var response = await Get<LoginResponse>(TokenRequestUrl, HttpMethod.Post, postContent);
             if (response == null) throw new Exception("Login Failed.");
             _credentials = new ImgurCredentials(response.AccessToken, response.RefreshToken, response.ExpiresIn);
         }
@@ -101,7 +109,7 @@ namespace ImgurDotNetSDK
                                                                 new KeyValuePair<string, string>("client_secret", _settings.ClientSecret),
                                                                 new KeyValuePair<string, string>("grant_type", "refresh_token")
                                                             });
-            var response = await Get<LoginResponse>(TokenRequestUrl, postContent);
+            var response = await Get<LoginResponse>(TokenRequestUrl, HttpMethod.Post, postContent);
             if (response == null) throw new Exception("Login Failed.");
             _credentials = new ImgurCredentials(response.AccessToken, response.RefreshToken, response.ExpiresIn);
         }
@@ -116,7 +124,7 @@ namespace ImgurDotNetSDK
         /// <returns></returns>
         public async Task<IEnumerable<ImgurGallery>> GetMainGallery(GalleryType galleryType, SortType sortType, int page = 0, bool showViral = false)
         {
-            var dtoGallery = await Get<GalleryResponse>(GalleryUrl.With(galleryType.EnumToString(), sortType.EnumToString(), page, showViral));
+            var dtoGallery = await Get<GalleryResponse>(GalleryUrl.With(galleryType.EnumToString(), sortType.EnumToString(), page, showViral), HttpMethod.Get);
             return dtoGallery.Data.Select(Mapper.Map<GalleryEntity, ImgurGallery>);
         }
 
@@ -139,7 +147,7 @@ namespace ImgurDotNetSDK
         /// <returns> The full gallery from Imgur.</returns>
         public async Task<ImgurGallery> GetGallery(Uri galleryUrl, bool autodownload = true)
         {
-            var dtoGallery = await Get<GalleryResponse>(galleryUrl);
+            var dtoGallery = await Get<GalleryResponse>(galleryUrl, HttpMethod.Get);
             var gallery = dtoGallery.Data.Select(Mapper.Map<GalleryEntity, ImgurGallery>).First();
             if (autodownload)
                 foreach (var image in gallery.Images)
@@ -168,16 +176,15 @@ namespace ImgurDotNetSDK
             return image;
         }
 
-        private async Task<T> Get<T>(string requestUrl, HttpContent postData = null) where T : class
+        private async Task<T> Get<T>(string requestUrl, HttpMethod httpMethod, HttpContent postData = null) where T : class
         {
-            return await Get<T>(new UriBuilder(requestUrl).Uri, postData);
+            return await Get<T>(new UriBuilder(requestUrl).Uri, httpMethod, postData);
         }
 
-        private async Task<T> Get<T>(Uri requestUri, HttpContent postData = null, int retryCount = 0) where T : class
+        private async Task<T> Get<T>(Uri requestUri, HttpMethod httpMethod, HttpContent postData = null, int retryCount = 0) where T : class
         {
             if (retryCount > 5) throw new Exception("Retry count exceeded.");
 
-            var httpMethod = postData == null ? HttpMethod.Get : HttpMethod.Post;
             using (var request = new HttpRequestMessage(httpMethod, requestUri) {Content = postData})
             {
                 if (_credentials != null)
@@ -192,7 +199,38 @@ namespace ImgurDotNetSDK
                         case HttpStatusCode.Forbidden:
                         case HttpStatusCode.Unauthorized:
                             await RefreshLogin();
-                            return await Get<T>(requestUri, postData, retryCount + 1);
+                            return await Get<T>(requestUri, httpMethod, postData, retryCount + 1);
+                        case HttpStatusCode.MethodNotAllowed:
+                        case HttpStatusCode.BadGateway:
+                            throw new ImgurDownException("Imgur is down, try the request again later.");
+                        default:
+                            Console.WriteLine(statusCode);
+                            Console.WriteLine(response.Content.ReadAsStringAsync().Result);
+                            throw new Exception("Unexpected HttpStatusCode encountered.");
+                    }
+                }
+            }
+        }
+
+        public async Task<string> Get(Uri requestUri, HttpMethod httpMethod, HttpContent postData = null, int retryCount = 0)
+        {
+            if (retryCount > 5) throw new Exception("Retry count exceeded.");
+
+            using (var request = new HttpRequestMessage(httpMethod, requestUri) { Content = postData })
+            {
+                if (_credentials != null)
+                    request.Headers.TryAddWithoutValidation("Authorization", "Bearer " + _credentials.AccessToken);
+                using (var response = await StaticHttpClient.Client.SendAsync(request))
+                {
+                    if (response.IsSuccessStatusCode)
+                        return await response.Content.ReadAsStringAsync();
+                    var statusCode = response.StatusCode;
+                    switch (statusCode)
+                    {
+                        case HttpStatusCode.Forbidden:
+                        case HttpStatusCode.Unauthorized:
+                            await RefreshLogin();
+                            return await Get(requestUri, httpMethod, postData, retryCount + 1);
                         case HttpStatusCode.MethodNotAllowed:
                         case HttpStatusCode.BadGateway:
                             throw new ImgurDownException("Imgur is down, try the request again later.");
