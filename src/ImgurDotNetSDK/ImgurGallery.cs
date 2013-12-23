@@ -26,7 +26,7 @@ namespace ImgurDotNetSDK
         /// <summary>
         /// Gets or sets the timestamp the image was created.
         /// </summary>
-        public long Timestamp { get; set; }
+        public DateTime Timestamp { get; set; }
 
         /// <summary>
         /// Gets or sets the cover image for the gallery.
