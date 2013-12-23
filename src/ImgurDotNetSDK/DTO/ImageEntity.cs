@@ -21,13 +21,13 @@ namespace ImgurDotNetSDK.DTO
         public string Type { get; set; }
 
         [DataMember(Name = "animated")]
-        public bool Animated { get; set; }
+        public bool IsAnimated { get; set; }
 
         [DataMember(Name = "width")]
-        public long Width { get; set; }
+        public int Width { get; set; }
 
         [DataMember(Name = "height")]
-        public long Height { get; set; }
+        public int Height { get; set; }
 
         [DataMember(Name = "size")]
         public long Size { get; set; }

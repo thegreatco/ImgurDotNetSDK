@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Text;
+﻿using System.Runtime.Serialization;
 
 namespace ImgurDotNetSDK.DTO
 {
@@ -10,6 +6,6 @@ namespace ImgurDotNetSDK.DTO
     internal class GalleryResponse : BasicResponse
     {
         [DataMember(Name = "data")]
-        public GalleryEntity[] Data { get; set; }
+        public GalleryEntity[] Entities { get; set; }
     }
 }

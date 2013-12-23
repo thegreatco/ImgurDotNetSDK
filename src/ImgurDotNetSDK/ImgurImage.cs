@@ -34,7 +34,7 @@ namespace ImgurDotNetSDK
         /// <summary>
         /// Gets or sets a value indicating whether the image is animated.
         /// </summary>
-        public bool Animated { get; set; }
+        public bool IsAnimated { get; set; }
 
         /// <summary>
         /// Gets or sets the image width.

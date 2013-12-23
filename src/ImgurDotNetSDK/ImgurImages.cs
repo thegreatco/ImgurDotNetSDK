@@ -10,6 +10,6 @@ namespace ImgurDotNetSDK
         /// <summary>
         /// Gets or sets a list of <see cref="ImgurImage"/> objects.
         /// </summary>
-        public List<ImgurImage> Images { get; set; }
+        public ImgurImage[] Images { get; set; }
     }
 }

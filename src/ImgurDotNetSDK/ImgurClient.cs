@@ -125,7 +125,7 @@ namespace ImgurDotNetSDK
         public async Task<IEnumerable<ImgurGallery>> GetMainGallery(GalleryType galleryType, SortType sortType, int page = 0, bool showViral = false)
         {
             var dtoGallery = await Get<GalleryResponse>(GalleryUrl.With(galleryType.EnumToString(), sortType.EnumToString(), page, showViral), HttpMethod.Get);
-            return dtoGallery.Data.Select(Mapper.Map<GalleryEntity, ImgurGallery>);
+            return dtoGallery.Entities.Select(Mapper.Map<GalleryEntity, ImgurGallery>);
         }
 
         /// <summary>
@@ -148,7 +148,7 @@ namespace ImgurDotNetSDK
         public async Task<ImgurGallery> GetGallery(Uri galleryUrl, bool autodownload = true)
         {
             var dtoGallery = await Get<GalleryResponse>(galleryUrl, HttpMethod.Get);
-            var gallery = dtoGallery.Data.Select(Mapper.Map<GalleryEntity, ImgurGallery>).First();
+            var gallery = dtoGallery.Entities.Select(Mapper.Map<GalleryEntity, ImgurGallery>).First();
             if (autodownload)
                 foreach (var image in gallery.Images)
                     image.RawImage = await GetImage(image.Link);

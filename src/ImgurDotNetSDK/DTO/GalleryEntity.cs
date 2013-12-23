@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Text;
+﻿using System.Runtime.Serialization;
 
 namespace ImgurDotNetSDK.DTO
 {
@@ -50,6 +46,30 @@ namespace ImgurDotNetSDK.DTO
 
         [DataMember(Name = "is_album")]
         public bool IsAlbum { get; set; }
+
+        [DataMember(Name = "type")]
+        public string Type { get; set; }
+
+        [DataMember(Name = "animated")]
+        public bool IsAnimated { get; set; }
+
+        [DataMember(Name = "width")]
+        public int Width { get; set; }
+
+        [DataMember(Name = "height")]
+        public int Height { get; set; }
+
+        [DataMember(Name = "size")]
+        public long Size { get; set; }
+
+        [DataMember(Name = "bandwidth")]
+        public long Bandwidth { get; set; }
+
+        [DataMember(Name = "deletehash")]
+        public string DeleteHash { get; set; }
+
+        [DataMember(Name = "section")]
+        public string Section { get; set; }
 
         [DataMember(Name = "vote")]
         public string Vote { get; set; }
