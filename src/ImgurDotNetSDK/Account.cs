@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -65,12 +66,12 @@ namespace ImgurDotNetSDK
         /// </summary>
         /// <param name="username"> The username of the account.  If null, replaced with "me". </param>
         /// <returns></returns>
-        public async Task<ImgurGallery> AccountFavorites(string username = null)
+        public async Task<ImgurGallery[]> AccountFavorites(string username = null)
         {
             username = username ?? "me";
             var uri = "https://api.imgur.com/3/account/{0}/favorites".ToUri(username);
             var model = await Get<DTO.GalleryResponse>(uri, HttpMethod.Get);
-            return Mapper.Map<DTO.GalleryResponse, ImgurGallery>(model);
+            return model.Entities.Select(Mapper.Map<DTO.GalleryEntity, ImgurGallery>).ToArray();
         }
     }
 }
