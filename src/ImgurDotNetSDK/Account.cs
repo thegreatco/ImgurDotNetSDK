@@ -53,12 +53,12 @@ namespace ImgurDotNetSDK
         /// </summary>
         /// <param name="username"> The username of the account.  If null, replaced with "me". </param>
         /// <returns> A <see cref="ImgurImages"/> containing all the favorites. </returns>
-        public async Task<ImgurImages> AccountGalleryFavorites(string username = null)
+        public async Task<ImgurImage[]> AccountGalleryFavorites(string username = null)
         {
             username = username ?? "me";
             var uri = "https://api.imgur.com/3/account/{0}/gallery_favorites".ToUri(username);
             var model = await Get<DTO.ImagesResponse>(uri, HttpMethod.Get);
-            return Mapper.Map<DTO.ImagesResponse, ImgurImages>(model);
+            return model.Data.Select(Mapper.Map<DTO.ImageEntity, ImgurImage>).ToArray();
         }
 
         /// <summary>
