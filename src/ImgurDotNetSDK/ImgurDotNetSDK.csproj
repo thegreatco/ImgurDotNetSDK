@@ -159,6 +159,7 @@
     <Compile Include="Model\ImgurReplyContent.cs" />
     <Compile Include="Model\ImgurSettings.cs" />
     <Compile Include="Model\ImgurTrophy.cs" />
+    <Compile Include="Model\IPostable.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Model\SortType.cs" />
     <Compile Include="StaticHttpClient.cs" />

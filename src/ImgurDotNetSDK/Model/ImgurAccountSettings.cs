@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ImgurDotNetSDK
 {
-    public class ImgurAccountSettings
+    public class ImgurAccountSettings : IPostable
     {
         /// <summary>
         /// Gets or sets the user email address.

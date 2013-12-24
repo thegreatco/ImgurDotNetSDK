@@ -18,6 +18,8 @@ namespace ImgurDotNetSDK
         /// <returns> An <see cref="ImgurAccount"/>. </returns>
         public async Task<ImgurAccount> AccountBase(string username = "me")
         {
+            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentNullException("username", "The username cannot be null.");
+
             var uri = "https://api.imgur.com/3/account/{0}".ToUri(username);
             var model = await Get<DTO.AccountResponse>(uri, HttpMethod.Get);
             return Mapper.Map<DTO.AccountResponse, ImgurAccount>(model);
@@ -31,6 +33,7 @@ namespace ImgurDotNetSDK
         public async Task<ImgurAccount> CreateAccount(string username = "me")
         {
             if (string.IsNullOrWhiteSpace(username)) throw new ArgumentNullException("username", "The username cannot be null.");
+
             var uri = "https://api.imgur.com/3/account/{0}".ToUri(username);
             var model = await Get<DTO.AccountResponse>(uri, HttpMethod.Post);
             return Mapper.Map<DTO.AccountResponse, ImgurAccount>(model);
@@ -68,6 +71,7 @@ namespace ImgurDotNetSDK
         public async Task<ImgurImage[]> AccountGalleryFavorites(string username = "me")
         {
             if (string.IsNullOrWhiteSpace(username)) throw new ArgumentNullException("username", "The username cannot be null.");
+
             var uri = "https://api.imgur.com/3/account/{0}/gallery_favorites".ToUri(username);
             var model = await Get<DTO.ImagesResponse>(uri, HttpMethod.Get);
             return model.Entity.Select(Mapper.Map<DTO.ImageEntity, ImgurImage>).ToArray();
@@ -81,6 +85,7 @@ namespace ImgurDotNetSDK
         public async Task<ImgurGallery[]> AccountFavorites(string username = "me")
         {
             if (string.IsNullOrWhiteSpace(username)) throw new ArgumentNullException("username", "The username cannot be null.");
+
             var uri = "https://api.imgur.com/3/account/{0}/favorites".ToUri(username);
             var model = await Get<DTO.GalleryResponse>(uri, HttpMethod.Get);
             return model.Entity.Select(Mapper.Map<DTO.GalleryEntity, ImgurGallery>).ToArray();
@@ -95,6 +100,7 @@ namespace ImgurDotNetSDK
         public async Task<ImgurGallery[]> AccountSubmissions(string username = "me", int page = 0)
         {
             if (string.IsNullOrWhiteSpace(username)) throw new ArgumentNullException("username", "The username cannot be null.");
+
             var uri = "https://api.imgur.com/3/account/{0}/submissions/{0}".ToUri(username, page);
             var model = await Get<DTO.GalleryResponse>(uri, HttpMethod.Get);
             return model.Entity.Select(Mapper.Map<DTO.GalleryEntity, ImgurGallery>).ToArray();
@@ -108,6 +114,7 @@ namespace ImgurDotNetSDK
         public async Task<ImgurAccountSettings> AccountSettings(string username = "me")
         {
             if (string.IsNullOrWhiteSpace(username)) throw new ArgumentNullException("username", "The username cannot be null.");
+
             var uri = "https://api.imgur.com/3/account/{0}/settings".ToUri(username);
             var model = await Get<DTO.AccountSettingsResponse>(uri, HttpMethod.Get);
             return Mapper.Map<DTO.AccountSettingsEntity, ImgurAccountSettings>(model.Entity);
@@ -123,15 +130,8 @@ namespace ImgurDotNetSDK
         {
             if (string.IsNullOrWhiteSpace(username)) throw new ArgumentNullException("username", "The username cannot be null.");
 
-            var uri = "https://api.imgur.com/3/account/{0}/settings?".With(username);
-
-            if (!string.IsNullOrWhiteSpace(settings.Biography)) uri += "bio={0}".With(settings.Biography);
-            if (settings.PublicImages != null) uri += "public_images={0}".With(settings.PublicImages);
-            if (settings.MessagingEnabled != null) uri += "messaging_enabled={0}".With(settings.MessagingEnabled.ToString());
-            if (settings.AlbumPrivacy != null) uri += "album_privacy={0}".With(settings.AlbumPrivacy.ToString());
-            if (settings.AcceptedGalleryTerms != null) uri += "accepted_gallery_terms={0}".With(settings.AcceptedGalleryTerms.ToString());
-
-            var model = await Get<DTO.BasicResponse>(uri.ToUri(), HttpMethod.Post);
+            var uri = "https://api.imgur.com/3/account/{0}/settings".With(username).ToUri(settings);
+            var model = await Get<DTO.BasicResponse>(uri, HttpMethod.Post);
             return Mapper.Map<DTO.BasicResponse, ImgurBasic>(model);
         }
 

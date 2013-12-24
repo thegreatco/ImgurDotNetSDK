@@ -38,11 +38,12 @@ namespace ImgurDotNetSDK
 
         public async Task<ImgurAlbum> CreateAlbum(ImgurAlbumProperties albumProps)
         {
-            var uri = "https://api.imgur.com/3/album";
-            var model = await Get<DTO.CreateAlbumResponse>(albumProps.FormatForUri(uri), HttpMethod.Post);
+            var uri = "https://api.imgur.com/3/album".ToUri(albumProps);
+            var model = await Get<DTO.CreateAlbumResponse>(uri, HttpMethod.Post);
             return Mapper.Map<DTO.CreateAlbumEntity, ImgurAlbum>(model.Entity);
         }
 
+        [Obsolete("This overload of CreateAlbum shouldn't be used.  Use the one that takes an ImgurAlbumProperties object.")]
         public async Task<ImgurAlbum> CreateAlbum(string[] ids = null, string title = null, string description = null, ImgurPrivacy? privacy = null, ImgurLayout? layout = null, string cover = null)
         {
             return await CreateAlbum(new ImgurAlbumProperties { Ids = ids, Title = title, Description = description, Privacy = privacy, Layout = layout, Cover = cover });

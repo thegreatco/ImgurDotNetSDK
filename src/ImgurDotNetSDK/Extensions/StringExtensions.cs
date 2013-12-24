@@ -21,5 +21,17 @@ namespace ImgurDotNetSDK.Extensions
         {
             return string.Join(delimeter, strings.Where(x => !string.IsNullOrWhiteSpace(x)));
         }
+
+        public static bool IsLower(this string @string)
+        {
+            var val = (int) @string[0];
+            return val >= 97 && val <= 122;
+        }
+
+        public static bool IsUpper(this string @string)
+        {
+            var val = (int) @string[0];
+            return val >= 65 && val <= 90;
+        }
     }
 }

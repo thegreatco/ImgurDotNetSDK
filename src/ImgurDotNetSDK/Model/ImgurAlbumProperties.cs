@@ -1,6 +1,6 @@
 ﻿namespace ImgurDotNetSDK
 {
-    public class ImgurAlbumProperties
+    public class ImgurAlbumProperties : IPostable
     {
         /// <summary>
         /// Gets or sets an array of <see cref="ImgurImage"/> ids.
