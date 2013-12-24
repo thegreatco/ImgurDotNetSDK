@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -10,6 +9,8 @@ namespace ImgurDotNetSDK
 {
     public partial class ImgurClient
     {
+        private string _deleteKey = Guid.NewGuid().ToString("N");
+
         /// <summary>
         /// Get the Account Base data. <see href="https://api.imgur.com/endpoints/account#account"/>
         /// </summary>
@@ -35,14 +36,25 @@ namespace ImgurDotNetSDK
             return Mapper.Map<DTO.AccountResponse, ImgurAccount>(model);
         }
 
+        public string RequestDeleteKey()
+        {
+            return _deleteKey;
+        }
+
         /// <summary>
         /// Delete an Imgur account.  <see href="https://api.imgur.com/endpoints/account#account-delete"/>
         /// </summary>
         /// <param name="username"> The username of the account to delete. </param>
+        /// <param name="requestKey"> This key must be requested via the <see cref="RequestDeleteKey"/> method to prevent accidental account deletion. </param>
         /// <returns> An <see cref="ImgurBasic"/> response.  Check the returned object for success of operation. </returns>
-        public async Task<ImgurBasic> DeleteAccount(string username = "me")
+        public async Task<ImgurBasic> DeleteAccount(string requestKey, string username = "me")
         {
+            if (requestKey != _deleteKey) throw new ArgumentException("Request key does not match the delete key, this is so you don't accidentally delete an account.", "requestKey");
             if (string.IsNullOrWhiteSpace(username)) throw new ArgumentNullException("username", "The username cannot be null.");
+
+            // Once the key is used, change it.
+            _deleteKey = Guid.NewGuid().ToString("N");
+
             var uri = "https://api.imgur.com/3/account/{0}".ToUri(username);
             var model = await Get<DTO.BasicResponse>(uri, HttpMethod.Delete);
             return Mapper.Map<DTO.BasicResponse, ImgurBasic>(model);
@@ -163,6 +175,7 @@ namespace ImgurDotNetSDK
             return model.Entity.Select(Mapper.Map<DTO.AlbumEntity, ImgurAlbum>).ToArray();
         }
 
+        /*
         public async Task<ImgurAlbum> Album(string albumId, string username = "me")
         {
             if (string.IsNullOrWhiteSpace(username)) throw new ArgumentNullException("username", "The username cannot be null.");
@@ -170,6 +183,7 @@ namespace ImgurDotNetSDK
             var model = await Get<DTO.AlbumResponse>(uri, HttpMethod.Get);
             return Mapper.Map<DTO.AlbumEntity, ImgurAlbum>(model.Entity);
         }
+        */
 
         public async Task<ImgurAlbumIds> AlbumIds(string username = "me")
         {
@@ -187,6 +201,7 @@ namespace ImgurDotNetSDK
             return model.Count;
         }
 
+        /*
         public async Task<bool> DeleteAlbum(string albumId, string username = "me")
         {
             if (string.IsNullOrWhiteSpace(username)) throw new ArgumentNullException("username", "The username cannot be null.");
@@ -194,6 +209,7 @@ namespace ImgurDotNetSDK
             var model = await Get<DTO.TrueFalseResponse>(uri, HttpMethod.Delete);
             return model.Response;
         }
+        */
 
         public async Task<ImgurComment[]> Comments(string username = "me")
         {
