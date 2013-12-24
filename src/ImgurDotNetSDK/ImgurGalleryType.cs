@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ImgurDotNetSDK
 {
-    public enum GalleryType
+    public enum ImgurGalleryType
     {
         Hot,
         Top,

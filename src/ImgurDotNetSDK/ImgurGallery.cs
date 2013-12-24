@@ -41,7 +41,7 @@ namespace ImgurDotNetSDK
         /// <summary>
         /// Gets or sets the privacy level of the album, you can only view public if not logged in as album owner.
         /// </summary>
-        public string Privacy { get; set; }
+        public ImgurPrivacy Privacy { get; set; }
 
         /// <summary>
         /// Gets or sets the view layout of the album.
@@ -129,7 +129,7 @@ namespace ImgurDotNetSDK
         public long ImagesCount { get; set; }
 
         /// <summary>
-        /// Gets or sets the array of <see cref="ImgurImages"/>.
+        /// Gets or sets the array of <see cref="ImgurImage"/>.
         /// </summary>
         public ImgurImage[] Images { get; set; }
 

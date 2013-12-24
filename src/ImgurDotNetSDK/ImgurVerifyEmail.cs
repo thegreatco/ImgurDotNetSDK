@@ -5,11 +5,11 @@ using System.Text;
 
 namespace ImgurDotNetSDK
 {
-    public class ImgurImages
+    public class ImgurVerifyEmail
     {
         /// <summary>
-        /// Gets or sets a list of <see cref="ImgurImage"/> objects.
+        /// Gets or sets a value indicating whether the user email address has been verified.
         /// </summary>
-        public ImgurImage[] Images { get; set; }
+        public bool Verified { get; set; }
     }
 }

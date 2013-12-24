@@ -6,7 +6,6 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using AutoMapper;
 using ImgurDotNet;
-using ImgurDotNetSDK.DTO;
 using ImgurDotNetSDK.Extensions;
 using ServiceStack.Text;
 
@@ -37,29 +36,31 @@ namespace ImgurDotNetSDK
             if (settings == null) throw new ArgumentNullException("settings", "Settings cannot be null.");
             _settings = settings;
 
-            Mapper.CreateMap<AccountSettingsEntity, ImgurAccountSettings>()
+            Mapper.CreateMap<DTO.AccountSettingsEntity, ImgurAccountSettings>()
                 .ForMember(x => x.ProExpiration, y => y.ResolveUsing(x =>
                                                                      {
                                                                          if (x.ProExpiration == "false") return null;
                                                                          return long.Parse(x.ProExpiration).FromUnixTime();
                                                                      }));
-            Mapper.CreateMap<CommentEntity, ImgurComment>()
+            Mapper.CreateMap<DTO.CommentEntity, ImgurComment>()
                 .ForMember(x => x.Timestamp, y => y.ResolveUsing(x => x.Timestamp.FromUnixTime()));
-            Mapper.CreateMap<AccountStatisticsEntity, ImgurAccountStatistics>();
-            Mapper.CreateMap<ImageEntity, ImgurImage>()
+            Mapper.CreateMap<DTO.TrophyEntity, ImgurTrophy>()
                 .ForMember(x => x.Timestamp, y => y.ResolveUsing(x => x.Timestamp.FromUnixTime()));
-            Mapper.CreateMap<ImagesResponse, ImgurImages>()
-                .ForMember(x => x.Images, y => y.MapFrom(x => x.Data));
-            Mapper.CreateMap<GalleryEntity, ImgurGallery>()
+            Mapper.CreateMap<DTO.VerifyEmailResponse, ImgurVerifyEmail>();
+            Mapper.CreateMap<DTO.GalleryProfileEntity, ImgurGalleryProfile>();
+            Mapper.CreateMap<DTO.AccountStatisticsEntity, ImgurAccountStatistics>();
+            Mapper.CreateMap<DTO.ImageEntity, ImgurImage>()
                 .ForMember(x => x.Timestamp, y => y.ResolveUsing(x => x.Timestamp.FromUnixTime()));
-            Mapper.CreateMap<AccountResponse, ImgurAccount>()
+            Mapper.CreateMap<DTO.GalleryEntity, ImgurGallery>()
+                .ForMember(x => x.Timestamp, y => y.ResolveUsing(x => x.Timestamp.FromUnixTime()));
+            Mapper.CreateMap<DTO.AccountResponse, ImgurAccount>()
                 .ForMember(x => x.Created, y => y.ResolveUsing(x => x.Created.FromUnixTime()))
                 .ForMember(x => x.ProExpiration, y => y.ResolveUsing(x =>
                                                                      {
                                                                          if (x.ProExpiration == "false") return null;
                                                                          return long.Parse(x.ProExpiration).FromUnixTime();
                                                                      }));
-            Mapper.CreateMap<BasicResponse, ImgurBasic>()
+            Mapper.CreateMap<DTO.BasicResponse, ImgurBasic>()
                 .ForMember(x => x.Status, y => y.ResolveUsing(x => (HttpStatusCode) x.Status));
         }
 
@@ -98,7 +99,7 @@ namespace ImgurDotNetSDK
                                                                 new KeyValuePair<string, string>("grant_type", "pin"),
                                                                 new KeyValuePair<string, string>("pin", pin)
                                                             });
-            var response = await Get<LoginResponse>(TokenRequestUrl, HttpMethod.Post, postContent);
+            var response = await Get<DTO.LoginResponse>(TokenRequestUrl, HttpMethod.Post, postContent);
             if (response == null) throw new Exception("Login Failed.");
             _credentials = new ImgurCredentials(response.AccessToken, response.RefreshToken, response.ExpiresIn);
         }
@@ -117,7 +118,7 @@ namespace ImgurDotNetSDK
                                                                 new KeyValuePair<string, string>("client_secret", _settings.ClientSecret),
                                                                 new KeyValuePair<string, string>("grant_type", "refresh_token")
                                                             });
-            var response = await Get<LoginResponse>(TokenRequestUrl, HttpMethod.Post, postContent);
+            var response = await Get<DTO.LoginResponse>(TokenRequestUrl, HttpMethod.Post, postContent);
             if (response == null) throw new Exception("Login Failed.");
             _credentials = new ImgurCredentials(response.AccessToken, response.RefreshToken, response.ExpiresIn);
         }
@@ -125,15 +126,15 @@ namespace ImgurDotNetSDK
         /// <summary>
         /// Gets the Main Gallery page, eg imgur.com
         /// </summary>
-        /// <param name="galleryType"> The <see cref="GalleryType"/> to retrieve. </param>
+        /// <param name="galleryType"> The <see cref="ImgurGalleryType"/> to retrieve. </param>
         /// <param name="sortType"> The <see cref="SortType"/> to use. </param>
         /// <param name="page"> The page number to retrieve. </param>
         /// <param name="showViral"> Show viral images or not. </param>
         /// <returns></returns>
-        public async Task<IEnumerable<ImgurGallery>> GetMainGallery(GalleryType galleryType, SortType sortType, int page = 0, bool showViral = false)
+        public async Task<IEnumerable<ImgurGallery>> GetMainGallery(ImgurGalleryType galleryType, SortType sortType, int page = 0, bool showViral = false)
         {
-            var dtoGallery = await Get<GalleryResponse>(GalleryUrl.With(galleryType.EnumToString(), sortType.EnumToString(), page, showViral), HttpMethod.Get);
-            return dtoGallery.Entities.Select(Mapper.Map<GalleryEntity, ImgurGallery>);
+            var dtoGallery = await Get<DTO.GalleryResponse>(GalleryUrl.With(galleryType.EnumToString(), sortType.EnumToString(), page, showViral), HttpMethod.Get);
+            return dtoGallery.Entity.Select(Mapper.Map<DTO.GalleryEntity, ImgurGallery>);
         }
 
         /// <summary>
@@ -155,8 +156,8 @@ namespace ImgurDotNetSDK
         /// <returns> The full gallery from Imgur.</returns>
         public async Task<ImgurGallery> GetGallery(Uri galleryUrl, bool autodownload = true)
         {
-            var dtoGallery = await Get<GalleryResponse>(galleryUrl, HttpMethod.Get);
-            var gallery = dtoGallery.Entities.Select(Mapper.Map<GalleryEntity, ImgurGallery>).First();
+            var dtoGallery = await Get<DTO.GalleryResponse>(galleryUrl, HttpMethod.Get);
+            var gallery = dtoGallery.Entity.Select(Mapper.Map<DTO.GalleryEntity, ImgurGallery>).First();
             if (autodownload)
                 foreach (var image in gallery.Images)
                     image.RawImage = await GetImage(image.Link);

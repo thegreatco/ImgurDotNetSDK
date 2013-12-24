@@ -59,7 +59,7 @@ namespace ImgurDotNetSDK
             username = username ?? "me";
             var uri = "https://api.imgur.com/3/account/{0}/gallery_favorites".ToUri(username);
             var model = await Get<DTO.ImagesResponse>(uri, HttpMethod.Get);
-            return model.Data.Select(Mapper.Map<DTO.ImageEntity, ImgurImage>).ToArray();
+            return model.Entity.Select(Mapper.Map<DTO.ImageEntity, ImgurImage>).ToArray();
         }
 
         /// <summary>
@@ -72,7 +72,7 @@ namespace ImgurDotNetSDK
             username = username ?? "me";
             var uri = "https://api.imgur.com/3/account/{0}/favorites".ToUri(username);
             var model = await Get<DTO.GalleryResponse>(uri, HttpMethod.Get);
-            return model.Entities.Select(Mapper.Map<DTO.GalleryEntity, ImgurGallery>).ToArray();
+            return model.Entity.Select(Mapper.Map<DTO.GalleryEntity, ImgurGallery>).ToArray();
         }
 
         /// <summary>
@@ -86,7 +86,7 @@ namespace ImgurDotNetSDK
             username = username ?? "me";
             var uri = "https://api.imgur.com/3/account/{0}/submissions/{0}".ToUri(username, page);
             var model = await Get<DTO.GalleryResponse>(uri, HttpMethod.Get);
-            return model.Entities.Select(Mapper.Map<DTO.GalleryEntity, ImgurGallery>).ToArray();
+            return model.Entity.Select(Mapper.Map<DTO.GalleryEntity, ImgurGallery>).ToArray();
         }
 
         /// <summary>
@@ -128,6 +128,38 @@ namespace ImgurDotNetSDK
             var uri = "https://api.imgur.com/3/account/{0}/stats".ToUri(username);
             var model = await Get<DTO.AccountStatisticsResponse>(uri, HttpMethod.Get);
             return Mapper.Map<DTO.AccountStatisticsEntity, ImgurAccountStatistics>(model.Entity);
+        }
+
+        public async Task<ImgurGalleryProfile> AccountGalleryProfile(string username = null)
+        {
+            username = username ?? "me";
+            var uri = "https://api.imgur.com/3/account/{0}/gallery_profile".ToUri(username);
+            var model = await Get<DTO.GalleryProfileResponse>(uri, HttpMethod.Get);
+            return Mapper.Map<DTO.GalleryProfileEntity, ImgurGalleryProfile>(model.Entity);
+        }
+
+        public async Task<ImgurVerifyEmail> VerifyUsersEmail(string username = null)
+        {
+            username = username ?? "me";
+            var uri = "https://api.imgur.com/3/account/{0}/verifyemail".ToUri(username);
+            var model = await Get<DTO.VerifyEmailResponse>(uri, HttpMethod.Get);
+            return Mapper.Map<DTO.VerifyEmailResponse, ImgurVerifyEmail>(model);
+        }
+
+        public async Task<ImgurVerifyEmail> SendVerificationEmail(string username = null)
+        {
+            username = username ?? "me";
+            var uri = "https://api.imgur.com/3/account/{0}/verifyemail".ToUri(username);
+            var model = await Get<DTO.VerifyEmailResponse>(uri, HttpMethod.Post);
+            return Mapper.Map<DTO.VerifyEmailResponse, ImgurVerifyEmail>(model);
+        }
+
+        public async Task<ImgurAlbum> Albums(string username = null, int page = 0)
+        {
+            username = username ?? "me";
+            var uri = "https://api.imgur.com/3/account/{0}/albums/{0}".ToUri(username, page);
+            var model = await Get<DTO.AlbumResponse>(uri, HttpMethod.Get);
+            return Mapper.Map<DTO.AlbumResponse, ImgurAlbum>(model);
         }
     }
 }

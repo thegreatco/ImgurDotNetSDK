@@ -10,6 +10,6 @@ namespace ImgurDotNetSDK.DTO
     internal class ImagesResponse : BasicResponse
     {
         [DataMember(Name = "data")]
-        public ImageEntity[] Data { get; set; }
+        public ImageEntity[] Entity { get; set; }
     }
 }

@@ -7,7 +7,7 @@ namespace ImgurDotNetSDK.Extensions
 {
     public static class StringExtensions
     {
-        public static string EnumToString(this GalleryType val)
+        public static string EnumToString(this ImgurGalleryType val)
         {
             return val.ToString().ToLower();
         }
