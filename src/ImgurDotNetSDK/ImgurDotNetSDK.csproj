@@ -89,7 +89,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Account.cs" />
+    <Compile Include="ImgurClientAccount.cs" />
     <Compile Include="DTO\AccountResponse.cs" />
     <Compile Include="DTO\AccountSettingsEntity.cs" />
     <Compile Include="DTO\AccountSettingsResponse.cs" />
