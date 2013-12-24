@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using ImgurDotNet;
@@ -39,9 +37,19 @@ namespace ImgurDotNetSDK
             if (settings == null) throw new ArgumentNullException("settings", "Settings cannot be null.");
             _settings = settings;
 
+            Mapper.CreateMap<AccountSettingsEntity, ImgurAccountSettings>()
+                .ForMember(x => x.ProExpiration, y => y.ResolveUsing(x =>
+                                                                     {
+                                                                         if (x.ProExpiration == "false") return null;
+                                                                         return long.Parse(x.ProExpiration).FromUnixTime();
+                                                                     }));
+            Mapper.CreateMap<CommentEntity, ImgurComment>()
+                .ForMember(x => x.Timestamp, y => y.ResolveUsing(x => x.Timestamp.FromUnixTime()));
+            Mapper.CreateMap<AccountStatisticsEntity, ImgurAccountStatistics>();
             Mapper.CreateMap<ImageEntity, ImgurImage>()
                 .ForMember(x => x.Timestamp, y => y.ResolveUsing(x => x.Timestamp.FromUnixTime()));
-            Mapper.CreateMap<ImagesResponse, ImgurImages>().ForMember(x => x.Images, y => y.MapFrom(x => x.Data));
+            Mapper.CreateMap<ImagesResponse, ImgurImages>()
+                .ForMember(x => x.Images, y => y.MapFrom(x => x.Data));
             Mapper.CreateMap<GalleryEntity, ImgurGallery>()
                 .ForMember(x => x.Timestamp, y => y.ResolveUsing(x => x.Timestamp.FromUnixTime()));
             Mapper.CreateMap<AccountResponse, ImgurAccount>()

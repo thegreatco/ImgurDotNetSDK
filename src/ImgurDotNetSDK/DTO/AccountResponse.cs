@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace ImgurDotNetSDK.DTO
 {
     [DataContract]
-    public class AccountResponse
+    internal class AccountResponse
     {
         [DataMember(Name = "id")]
         public long Id { get; set; }
