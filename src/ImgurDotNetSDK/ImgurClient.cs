@@ -46,7 +46,7 @@ namespace ImgurDotNetSDK
                 .ForMember(x => x.Timestamp, y => y.ResolveUsing(x => x.Timestamp.FromUnixTime()));
             Mapper.CreateMap<DTO.TrophyEntity, ImgurTrophy>()
                 .ForMember(x => x.Timestamp, y => y.ResolveUsing(x => x.Timestamp.FromUnixTime()));
-            Mapper.CreateMap<DTO.VerifyEmailResponse, ImgurVerifyEmail>();
+            Mapper.CreateMap<DTO.TrueFalseResponse, ImgurVerifyEmail>();
             Mapper.CreateMap<DTO.GalleryProfileEntity, ImgurGalleryProfile>();
             Mapper.CreateMap<DTO.AccountStatisticsEntity, ImgurAccountStatistics>();
             Mapper.CreateMap<DTO.ImageEntity, ImgurImage>()

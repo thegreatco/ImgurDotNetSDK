@@ -3,9 +3,9 @@
 namespace ImgurDotNetSDK.DTO
 {
     [DataContract]
-    internal class VerifyEmailResponse : BasicResponse
+    internal class AlbumsResponse : BasicResponse
     {
         [DataMember(Name = "data")]
-        public bool Entity { get; set; }
+        public AlbumEntity[] Entity { get; set; }
     }
 }

@@ -138,28 +138,140 @@ namespace ImgurDotNetSDK
             return Mapper.Map<DTO.GalleryProfileEntity, ImgurGalleryProfile>(model.Entity);
         }
 
-        public async Task<ImgurVerifyEmail> VerifyUsersEmail(string username = null)
+        public async Task<bool> VerifyUsersEmail(string username = null)
         {
             username = username ?? "me";
             var uri = "https://api.imgur.com/3/account/{0}/verifyemail".ToUri(username);
-            var model = await Get<DTO.VerifyEmailResponse>(uri, HttpMethod.Get);
-            return Mapper.Map<DTO.VerifyEmailResponse, ImgurVerifyEmail>(model);
+            var model = await Get<DTO.TrueFalseResponse>(uri, HttpMethod.Get);
+            return model.Response;
         }
 
-        public async Task<ImgurVerifyEmail> SendVerificationEmail(string username = null)
+        public async Task<bool> SendVerificationEmail(string username = null)
         {
             username = username ?? "me";
             var uri = "https://api.imgur.com/3/account/{0}/verifyemail".ToUri(username);
-            var model = await Get<DTO.VerifyEmailResponse>(uri, HttpMethod.Post);
-            return Mapper.Map<DTO.VerifyEmailResponse, ImgurVerifyEmail>(model);
+            var model = await Get<DTO.TrueFalseResponse>(uri, HttpMethod.Post);
+            return model.Response;
         }
 
-        public async Task<ImgurAlbum> Albums(string username = null, int page = 0)
+        public async Task<ImgurAlbum[]> Albums(string username = null, int page = 0)
         {
             username = username ?? "me";
             var uri = "https://api.imgur.com/3/account/{0}/albums/{0}".ToUri(username, page);
+            var model = await Get<DTO.AlbumsResponse>(uri, HttpMethod.Get);
+            return model.Entity.Select(Mapper.Map<DTO.AlbumEntity, ImgurAlbum>).ToArray();
+        }
+
+        public async Task<ImgurAlbum> Album(string albumId, string username = null)
+        {
+            username = username ?? "me";
+            var uri = "https://api.imgur.com/3/account/{0}/album/{0}".ToUri(username, albumId);
             var model = await Get<DTO.AlbumResponse>(uri, HttpMethod.Get);
-            return Mapper.Map<DTO.AlbumResponse, ImgurAlbum>(model);
+            return Mapper.Map<DTO.AlbumEntity, ImgurAlbum>(model.Entity);
+        }
+
+        public async Task<ImgurAlbumIds> AlbumIds(string username = null)
+        {
+            username = username ?? "me";
+            var uri = "https://api.imgur.com/3/account/{0}/albums/ids".ToUri(username);
+            var model = await Get<DTO.AlbumIdsResponse>(uri, HttpMethod.Get);
+            return Mapper.Map<DTO.AlbumIdsResponse, ImgurAlbumIds>(model);
+        }
+
+        public async Task<long> AlbumCount(string username = null)
+        {
+            username = username ?? "me";
+            var uri = "https://api.imgur.com/3/account/{0}/albums/ids".ToUri(username);
+            var model = await Get<DTO.AlbumCountResponse>(uri, HttpMethod.Get);
+            return model.Count;
+        }
+
+        public async Task<bool> DeleteAlbum(string albumId, string username = null)
+        {
+            username = username ?? "me";
+            var uri = "https://api.imgur.com/3/account/{0}/albums/{1}".ToUri(username, albumId);
+            var model = await Get<DTO.TrueFalseResponse>(uri, HttpMethod.Delete);
+            return model.Response;
+        }
+
+        public async Task<ImgurComment[]> Comments(string username = null)
+        {
+            username = username ?? "me";
+            var uri = "https://api.imgur.com/3/account/{0}/comments".ToUri(username);
+            var model = await Get<DTO.CommentsResponse>(uri, HttpMethod.Get);
+            return Mapper.Map<DTO.CommentEntity[], ImgurComment[]>(model.Entity);
+        }
+
+        public async Task<ImgurComment> Comment(string commentId, string username = null)
+        {
+            username = username ?? "me";
+            var uri = "https://api.imgur.com/3/account/{0}/comment/{1}".ToUri(username, commentId);
+            var model = await Get<DTO.CommentResponse>(uri, HttpMethod.Get);
+            return Mapper.Map<DTO.CommentEntity, ImgurComment>(model.Entity);
+        }
+
+        public async Task<string[]> CommentIds(string username = null)
+        {
+            username = username ?? "me";
+            var uri = "https://api.imgur.com/3/account/{0}/comments/ids".ToUri(username);
+            var model = await Get<DTO.CommentIdsResponse>(uri, HttpMethod.Get);
+            return model.CommentIds;
+        }
+
+        public async Task<long> CommentCount(string username = null)
+        {
+            username = username ?? "me";
+            var uri = "https://api.imgur.com/3/account/{0}/comments/count".ToUri(username);
+            var model = await Get<DTO.CommentCountResponse>(uri, HttpMethod.Get);
+            return model.Count;
+        }
+
+        public async Task<bool> DeleteComment(string commentId, string username = null)
+        {
+            username = username ?? "me";
+            var uri = "https://api.imgur.com/3/account/{0}/comment/{1}".ToUri(username, commentId);
+            var model = await Get<DTO.TrueFalseResponse>(uri, HttpMethod.Delete);
+            return model.Response;
+        }
+
+        public async Task<ImgurImage[]> Images(string username = null, int page = 0)
+        {
+            username = username ?? "me";
+            var uri = "https://api.imgur.com/3/account/{0}/albums/{0}".ToUri(username, page);
+            var model = await Get<DTO.ImagesResponse>(uri, HttpMethod.Get);
+            return model.Entity.Select(Mapper.Map<DTO.ImageEntity, ImgurImage>).ToArray();
+        }
+
+        public async Task<ImgurImage> Image(string imageId = null, string username = null)
+        {
+            username = username ?? "me";
+            var uri = "https://api.imgur.com/3/account/{0}/image/{0}".ToUri(username, imageId);
+            var model = await Get<DTO.ImageResponse>(uri, HttpMethod.Get);
+            return Mapper.Map<DTO.ImageEntity, ImgurImage>(model.Entity);
+        }
+
+        public async Task<string[]> ImageIds(string username = null)
+        {
+            username = username ?? "me";
+            var uri = "https://api.imgur.com/3/account/{0}/comments/ids".ToUri(username);
+            var model = await Get<DTO.ImageIdsResponse>(uri, HttpMethod.Get);
+            return model.ImageIds;
+        }
+
+        public async Task<long> ImageCount(string username = null)
+        {
+            username = username ?? "me";
+            var uri = "https://api.imgur.com/3/account/{0}/image/count".ToUri(username);
+            var model = await Get<DTO.ImageCountResponse>(uri, HttpMethod.Get);
+            return model.Count;
+        }
+
+        public async Task<bool> DeleteImage(string imageId, string username = null)
+        {
+            username = username ?? "me";
+            var uri = "https://api.imgur.com/3/account/{0}/images/{1}".ToUri(username, imageId);
+            var model = await Get<DTO.TrueFalseResponse>(uri, HttpMethod.Delete);
+            return model.Response;
         }
     }
 }
