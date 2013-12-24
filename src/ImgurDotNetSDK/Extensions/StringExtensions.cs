@@ -12,12 +12,6 @@ namespace ImgurDotNetSDK.Extensions
             return string.Format(@string, args);
         }
 
-        [StringFormatMethod("format")]
-        public static Uri ToUri(this string @string, params object[] args)
-        {
-            return new UriBuilder(@string.With(args)).Uri;
-        }
-
         public static string Join(this string[] strings, string delimeter)
         {
             return string.Join(delimeter, strings);

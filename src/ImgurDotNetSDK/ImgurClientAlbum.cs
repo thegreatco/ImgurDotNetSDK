@@ -36,17 +36,16 @@ namespace ImgurDotNetSDK
             return Mapper.Map<DTO.AlbumIdsResponse, ImgurAlbumIds>(model);
         }
 
+        public async Task<ImgurAlbum> CreateAlbum(ImgurAlbumProperties albumProps)
+        {
+            var uri = "https://api.imgur.com/3/album";
+            var model = await Get<DTO.CreateAlbumResponse>(albumProps.FormatForUri(uri), HttpMethod.Post);
+            return Mapper.Map<DTO.CreateAlbumEntity, ImgurAlbum>(model.Entity);
+        }
+
         public async Task<ImgurAlbum> CreateAlbum(string[] ids = null, string title = null, string description = null, ImgurPrivacy? privacy = null, ImgurLayout? layout = null, string cover = null)
         {
-            var uri = "https://api.imgur.com/3/album/?";
-            if (ids != null) uri += "ids[]={0}".With(ids.ValidatedJoin(","));
-            if (!string.IsNullOrWhiteSpace(title)) uri += "title={0}".With(title);
-            if (!string.IsNullOrWhiteSpace(description)) uri += "description={0}".With(description);
-            if (privacy != null) uri += "privacy={0}".With(privacy.EnumToString());
-            if (layout != null) uri += "layout={0}".With(layout.EnumToString());
-            if (!string.IsNullOrWhiteSpace(cover)) uri += "cover={0}".With(cover);
-            var model = await Get<DTO.CreateAlbumResponse>(uri, HttpMethod.Post);
-            return Mapper.Map<DTO.CreateAlbumEntity, ImgurAlbum>(model.Entity);
+            return await CreateAlbum(new ImgurAlbumProperties { Ids = ids, Title = title, Description = description, Privacy = privacy, Layout = layout, Cover = cover });
         }
 
         public async Task<long> UpdateAlbum(string albumId)
