@@ -280,8 +280,9 @@ namespace ImgurDotNetSDK
         public async Task<ImgurNotification> Replies(bool newNotificationsOnly, string username = null)
         {
             username = username ?? "me";
-            var uri = "https://api.imgur.com/3/account/{0}/notifications/replies?new={1}".ToUri(username, newNotificationsOnly.ToString().ToLower());
+            var uri = "https://api.imgur.com/3/account/{0}/notifications/replies?new={1}".ToUri(username, newNotificationsOnly);
             var model = await Get<DTO.NotificationsResponse>(uri, HttpMethod.Get);
+            Console.WriteLine(model);
             return Mapper.Map<DTO.NotificationEntity, ImgurNotification>(model.Entity);
         }
     }
