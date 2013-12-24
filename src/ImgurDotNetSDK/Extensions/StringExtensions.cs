@@ -1,30 +1,31 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using JetBrains.Annotations;
 
 namespace ImgurDotNetSDK.Extensions
 {
     public static class StringExtensions
     {
-        public static string EnumToString(this ImgurGalleryType val)
-        {
-            return val.ToString().ToLower();
-        }
-
-        public static string EnumToString(this SortType val)
-        {
-            return val.ToString().ToLower();
-        }
-
+        [StringFormatMethod("format")]
         public static string With(this string @string, params object[] args)
         {
             return string.Format(@string, args);
         }
 
+        [StringFormatMethod("format")]
         public static Uri ToUri(this string @string, params object[] args)
         {
             return new UriBuilder(@string.With(args)).Uri;
+        }
+
+        public static string Join(this string[] strings, string delimeter)
+        {
+            return string.Join(delimeter, strings);
+        }
+
+        public static string ValidatedJoin(this string[] strings, string delimeter)
+        {
+            return string.Join(delimeter, strings.Where(x => !string.IsNullOrWhiteSpace(x)));
         }
     }
 }

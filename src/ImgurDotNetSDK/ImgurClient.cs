@@ -228,7 +228,7 @@ namespace ImgurDotNetSDK
         public async Task<string> Get(Uri requestUri, HttpMethod httpMethod, HttpContent postData = null, int retryCount = 0)
         {
             if (retryCount > 5) throw new Exception("Retry count exceeded.");
-
+            
             using (var request = new HttpRequestMessage(httpMethod, requestUri) { Content = postData })
             {
                 if (_credentials != null)

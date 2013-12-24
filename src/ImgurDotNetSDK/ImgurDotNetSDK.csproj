@@ -41,6 +41,9 @@
     <Reference Include="AutoMapper.Net4">
       <HintPath>..\..\packages\AutoMapper.3.1.0\lib\net40\AutoMapper.Net4.dll</HintPath>
     </Reference>
+    <Reference Include="JetBrains.Annotations">
+      <HintPath>..\..\packages\JetBrains.Annotations.7.0\lib\net40\JetBrains.Annotations.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Threading.Tasks">
       <HintPath>..\..\packages\Microsoft.Bcl.Async.1.0.165\lib\net40\Microsoft.Threading.Tasks.dll</HintPath>
     </Reference>
@@ -89,6 +92,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DTO\CreateAlbumEntity.cs" />
+    <Compile Include="DTO\CreateAlbumResponse.cs" />
+    <Compile Include="Extensions\EnumExtensions.cs" />
+    <Compile Include="ImgurClientAlbum.cs" />
     <Compile Include="ImgurClientAccount.cs" />
     <Compile Include="DTO\AccountResponse.cs" />
     <Compile Include="DTO\AccountSettingsEntity.cs" />
@@ -142,6 +149,7 @@
     <Compile Include="ImgurGallery.cs" />
     <Compile Include="ImgurGalleryProfile.cs" />
     <Compile Include="ImgurImage.cs" />
+    <Compile Include="ImgurLayout.cs" />
     <Compile Include="ImgurMessage.cs" />
     <Compile Include="ImgurNotification.cs" />
     <Compile Include="ImgurPrivacy.cs" />
