@@ -115,7 +115,12 @@
     <Compile Include="DTO\ImageCountResponse.cs" />
     <Compile Include="DTO\ImageResponse.cs" />
     <Compile Include="DTO\ImagesResponse.cs" />
+    <Compile Include="DTO\MessageEntity.cs" />
+    <Compile Include="DTO\NotificationEntity.cs" />
+    <Compile Include="DTO\ReplyEntity.cs" />
+    <Compile Include="DTO\NotificationsResponse.cs" />
     <Compile Include="DTO\RawResponse.cs" />
+    <Compile Include="DTO\ReplyEntityContent.cs" />
     <Compile Include="DTO\TrophyEntity.cs" />
     <Compile Include="DTO\TrueFalseResponse.cs" />
     <Compile Include="Extensions\DateTimeExtensions.cs" />
@@ -137,7 +142,11 @@
     <Compile Include="ImgurGallery.cs" />
     <Compile Include="ImgurGalleryProfile.cs" />
     <Compile Include="ImgurImage.cs" />
+    <Compile Include="ImgurMessage.cs" />
+    <Compile Include="ImgurNotification.cs" />
     <Compile Include="ImgurPrivacy.cs" />
+    <Compile Include="ImgurReply.cs" />
+    <Compile Include="ImgurReplyContent.cs" />
     <Compile Include="ImgurSettings.cs" />
     <Compile Include="ImgurTrophy.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

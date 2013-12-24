@@ -111,14 +111,17 @@ namespace ImgurDotNetSDK
         public async Task<ImgurBasic> ChangeAccountSettings(ImgurAccountSettings settings, string username = null)
         {
             username = username ?? "me";
+            var uri = "https://api.imgur.com/3/account/{0}/settings".ToUri(username);
+
             var kvps = new List<KeyValuePair<string, string>>();
             if (!string.IsNullOrWhiteSpace(settings.Biography)) kvps.Add(new KeyValuePair<string, string>("bio", settings.Biography));
             if (settings.PublicImages != null) kvps.Add(new KeyValuePair<string, string>("public_images", settings.PublicImages.ToString()));
             if (settings.MessagingEnabled != null) kvps.Add(new KeyValuePair<string, string>("messaging_enabled", settings.MessagingEnabled.ToString()));
             if (settings.AlbumPrivacy != null) kvps.Add(new KeyValuePair<string, string>("album_privacy", settings.AlbumPrivacy.ToString()));
             if (settings.AcceptedGalleryTerms != null) kvps.Add(new KeyValuePair<string, string>("accepted_gallery_terms", settings.AcceptedGalleryTerms.ToString()));
+
             var postContent = new FormUrlEncodedContent(kvps);
-            var model = await Get<DTO.BasicResponse>("https://api.imgur.com/3/account/{0}/settings".ToUri(username), HttpMethod.Post, postContent);
+            var model = await Get<DTO.BasicResponse>(uri, HttpMethod.Post, postContent);
             return Mapper.Map<DTO.BasicResponse, ImgurBasic>(model);
         }
 
@@ -253,7 +256,7 @@ namespace ImgurDotNetSDK
         public async Task<string[]> ImageIds(string username = null)
         {
             username = username ?? "me";
-            var uri = "https://api.imgur.com/3/account/{0}/comments/ids".ToUri(username);
+            var uri = "https://api.imgur.com/3/account/{0}/images/ids".ToUri(username);
             var model = await Get<DTO.ImageIdsResponse>(uri, HttpMethod.Get);
             return model.ImageIds;
         }
@@ -261,17 +264,25 @@ namespace ImgurDotNetSDK
         public async Task<long> ImageCount(string username = null)
         {
             username = username ?? "me";
-            var uri = "https://api.imgur.com/3/account/{0}/image/count".ToUri(username);
+            var uri = "https://api.imgur.com/3/account/{0}/images/count".ToUri(username);
             var model = await Get<DTO.ImageCountResponse>(uri, HttpMethod.Get);
             return model.Count;
         }
 
-        public async Task<bool> DeleteImage(string imageId, string username = null)
+        public async Task<bool> DeleteImage(string deleteHash, string username = null)
         {
             username = username ?? "me";
-            var uri = "https://api.imgur.com/3/account/{0}/images/{1}".ToUri(username, imageId);
+            var uri = "https://api.imgur.com/3/account/{0}/images/{1}".ToUri(username, deleteHash);
             var model = await Get<DTO.TrueFalseResponse>(uri, HttpMethod.Delete);
             return model.Response;
+        }
+
+        public async Task<ImgurNotification> Replies(bool newNotificationsOnly, string username = null)
+        {
+            username = username ?? "me";
+            var uri = "https://api.imgur.com/3/account/{0}/notifications/replies?new={1}".ToUri(username, newNotificationsOnly.ToString().ToLower());
+            var model = await Get<DTO.NotificationsResponse>(uri, HttpMethod.Get);
+            return Mapper.Map<DTO.NotificationEntity, ImgurNotification>(model.Entity);
         }
     }
 }

@@ -36,6 +36,11 @@ namespace ImgurDotNetSDK
             if (settings == null) throw new ArgumentNullException("settings", "Settings cannot be null.");
             _settings = settings;
 
+            Mapper.CreateMap<DTO.MessageEntity, ImgurMessage>();
+            Mapper.CreateMap<DTO.ReplyEntityContent, ImgurReplyContent>()
+                .ForMember(x => x.Timestamp, y => y.ResolveUsing(x => x.Timestamp.FromUnixTime()));
+            Mapper.CreateMap<DTO.ReplyEntity, ImgurReply>();
+            Mapper.CreateMap<DTO.NotificationEntity, ImgurNotification>();
             Mapper.CreateMap<DTO.AccountSettingsEntity, ImgurAccountSettings>()
                 .ForMember(x => x.ProExpiration, y => y.ResolveUsing(x =>
                                                                      {
@@ -46,7 +51,6 @@ namespace ImgurDotNetSDK
                 .ForMember(x => x.Timestamp, y => y.ResolveUsing(x => x.Timestamp.FromUnixTime()));
             Mapper.CreateMap<DTO.TrophyEntity, ImgurTrophy>()
                 .ForMember(x => x.Timestamp, y => y.ResolveUsing(x => x.Timestamp.FromUnixTime()));
-            Mapper.CreateMap<DTO.TrueFalseResponse, ImgurVerifyEmail>();
             Mapper.CreateMap<DTO.GalleryProfileEntity, ImgurGalleryProfile>();
             Mapper.CreateMap<DTO.AccountStatisticsEntity, ImgurAccountStatistics>();
             Mapper.CreateMap<DTO.ImageEntity, ImgurImage>()
