@@ -15,6 +15,11 @@ namespace ImgurDotNetSDK
         public string ImageId { get; set; }
 
         /// <summary>
+        /// Gets or sets if this is a reply, this will be the value of the comment_id for the caption this a reply for.
+        /// </summary>
+        public long ParentId { get; set; }
+
+        /// <summary>
         /// Gets or sets the comment itself.
         /// </summary>
         public string Comment { get; set; }
@@ -58,11 +63,6 @@ namespace ImgurDotNetSDK
         /// Gets or sets the timestamp of creation, epoch time
         /// </summary>
         public DateTime? Timestamp { get; set; }
-
-        /// <summary>
-        /// Gets or sets if this is a reply, this will be the value of the comment_id for the caption this a reply for.
-        /// </summary>
-        public long ParentId { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this caption has been deleted.

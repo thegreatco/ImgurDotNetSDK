@@ -5,8 +5,8 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using AutoMapper;
+using DotNetExtensions;
 using ImgurDotNet;
-using ImgurDotNetSDK.Extensions;
 using ServiceStack.Text;
 
 namespace ImgurDotNetSDK

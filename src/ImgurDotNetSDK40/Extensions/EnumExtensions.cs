@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ImgurDotNetSDK.Extensions
+namespace DotNetExtensions
 {
     public static class EnumExtensions
     {

@@ -2,7 +2,7 @@
 using System.Net.Http;
 using System.Threading.Tasks;
 using AutoMapper;
-using ImgurDotNetSDK.Extensions;
+using DotNetExtensions;
 
 namespace ImgurDotNetSDK
 {
@@ -49,13 +49,13 @@ namespace ImgurDotNetSDK
             return await CreateAlbum(new ImgurAlbumProperties { Ids = ids, Title = title, Description = description, Privacy = privacy, Layout = layout, Cover = cover });
         }
 
-        public async Task<long> UpdateAlbum(string albumId)
+        public async Task<ImgurAlbum> UpdateAlbum(string albumId, ImgurAlbumProperties albumProps)
         {
             if (string.IsNullOrWhiteSpace(albumId)) throw new ArgumentNullException("albumId", "The Album Id cannot be null.");
 
-            var uri = "https://api.imgur.com/3/album/{0}".ToUri(albumId);
-            var model = await Get<DTO.AlbumCountResponse>(uri, HttpMethod.Get);
-            return model.Count;
+            var uri = "https://api.imgur.com/3/album".ToUri(albumProps);
+            var model = await Get<DTO.CreateAlbumResponse>(uri, HttpMethod.Post);
+            return Mapper.Map<DTO.CreateAlbumEntity, ImgurAlbum>(model.Entity);
         }
 
         public async Task<bool> DeleteAlbum(string albumId)
@@ -74,6 +74,36 @@ namespace ImgurDotNetSDK
             var uri = "https://api.imgur.com/3/album/{0}/favorite".ToUri(albumId);
             var model = await Get<DTO.TrueFalseResponse>(uri, HttpMethod.Post);
             return model.Response;
+        }
+
+        public async Task<ImgurAlbum> SetAlbumImages(string albumId, string[] ids)
+        {
+            if (string.IsNullOrWhiteSpace(albumId)) throw new ArgumentNullException("albumId", "The Album Id cannot be null.");
+            if (ids == null) throw new ArgumentNullException("ids", "The list of picture Ids cannot be null.");
+
+            return await UpdateAlbum(albumId, new ImgurAlbumProperties { Ids = ids });
+        }
+
+        public async Task<ImgurAlbum> AddAlbumImages(string albumId, string[] ids)
+        {
+            if (string.IsNullOrWhiteSpace(albumId)) throw new ArgumentNullException("albumId", "The Album Id cannot be null.");
+            if (ids == null) throw new ArgumentNullException("ids", "The list of picture Ids cannot be null.");
+
+            var albumProps = new ImgurAlbumProperties { Ids = ids };
+            var uri = "https://api.imgur.com/3/album/{0}/add".ToUri(albumProps, albumId);
+            var model = await Get<DTO.CreateAlbumResponse>(uri, HttpMethod.Post);
+            return Mapper.Map<DTO.CreateAlbumEntity, ImgurAlbum>(model.Entity);
+        }
+
+        public async Task<ImgurAlbum> RemoveAlbumImages(string albumId, string[] ids)
+        {
+            if (string.IsNullOrWhiteSpace(albumId)) throw new ArgumentNullException("albumId", "The Album Id cannot be null.");
+            if (ids == null) throw new ArgumentNullException("ids", "The list of picture Ids cannot be null.");
+
+            var albumProps = new ImgurAlbumProperties { Ids = ids };
+            var uri = "https://api.imgur.com/3/album/{0}/remove_images".ToUri(albumProps, albumId);
+            var model = await Get<DTO.CreateAlbumResponse>(uri, HttpMethod.Delete);
+            return Mapper.Map<DTO.CreateAlbumEntity, ImgurAlbum>(model.Entity);
         }
     }
 }

@@ -3,7 +3,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using AutoMapper;
-using ImgurDotNetSDK.Extensions;
+using DotNetExtensions;
 
 namespace ImgurDotNetSDK
 {
@@ -39,6 +39,10 @@ namespace ImgurDotNetSDK
             return Mapper.Map<DTO.AccountResponse, ImgurAccount>(model);
         }
 
+        /// <summary>
+        /// Call this method to get a key required to ensure an account isn't accidentally deleted.
+        /// </summary>
+        /// <returns> The delete key for DeleteAccount.</returns>
         public string RequestDeleteKey()
         {
             return _deleteKey;
@@ -300,7 +304,7 @@ namespace ImgurDotNetSDK
             var model = await Get<DTO.ImageCountResponse>(uri, HttpMethod.Get);
             return model.Count;
         }
-
+        
         public async Task<bool> DeleteImage(string deleteHash, string username = "me")
         {
             if (string.IsNullOrWhiteSpace(username)) throw new ArgumentNullException("username", "The username cannot be null.");

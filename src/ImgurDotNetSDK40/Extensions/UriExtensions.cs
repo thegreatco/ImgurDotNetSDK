@@ -3,7 +3,7 @@ using System.Reflection;
 using System.Text;
 using JetBrains.Annotations;
 
-namespace ImgurDotNetSDK.Extensions
+namespace DotNetExtensions
 {
     public static class UriExtensions
     {
@@ -13,12 +13,13 @@ namespace ImgurDotNetSDK.Extensions
             return new UriBuilder(@string.With(args)).Uri;
         }
 
-        public static Uri ToUri(this string @string, IPostable obj)
+        [StringFormatMethod("format")]
+        public static Uri ToUri(this string @string, IUrlFormatable obj, params object[] args)
         {
-            return obj.FormatForUri(@string);
+            return obj.FormatForUri(@string.With(args));
         }
 
-        private static Uri FormatForUri<T>(this T obj, string baseString)
+        private static Uri FormatForUri<T>(this T obj, string baseString) where T : IUrlFormatable
         {
             var allNull = true;
             var props = obj.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
@@ -27,7 +28,9 @@ namespace ImgurDotNetSDK.Extensions
                 var val = prop.GetValue(obj, null);
                 if (val == null) continue;
 
-                var propName = prop.Name.FormatUriParameter();
+                var propName = obj.SplitOnCamelCase()
+                    ? prop.Name.FormatUriParameter(obj.MultiWordDelimeter())
+                    : prop.Name;
 
                 allNull = false;
                 var stringArray = val as string[];
@@ -58,14 +61,16 @@ namespace ImgurDotNetSDK.Extensions
             return baseString.ToUri();
         }
 
-        private static string FormatUriParameter(this string @string)
+        private static string FormatUriParameter(this string @string, string delimeter)
         {
+            if (string.IsNullOrWhiteSpace(@string)) throw new ArgumentNullException("string");
+            if (string.IsNullOrWhiteSpace(delimeter)) throw new ArgumentNullException("delimeter");
+
             var builder = new StringBuilder();
             for (var i = 0; i < @string.Length; i++)
             {
                 builder.Append(@string[i]);
-                if (i < @string.Length - 1)
-                    if (char.IsLower(@string[i]) && char.IsUpper(@string[i + 1])) builder.Append("_");
+                if (i < @string.Length - 1 && char.IsLower(@string[i]) && char.IsUpper(@string[i + 1])) builder.Append(delimeter);
             }
 
             return builder.ToString().ToLower();
