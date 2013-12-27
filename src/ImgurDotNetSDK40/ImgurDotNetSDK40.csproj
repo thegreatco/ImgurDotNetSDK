@@ -301,9 +301,6 @@
     <Compile Include="..\ImgurDotNetSDK45\Model\ImgurVote.cs">
       <Link>Model\ImgurVote.cs</Link>
     </Compile>
-    <Compile Include="..\ImgurDotNetSDK45\Model\IPostable.cs">
-      <Link>Model\IPostable.cs</Link>
-    </Compile>
     <Compile Include="..\ImgurDotNetSDK45\Model\SortType.cs">
       <Link>Model\SortType.cs</Link>
     </Compile>
