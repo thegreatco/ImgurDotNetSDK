@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ImgurDotNetSDK
 {
-    public class ImgurAccountSettings : IPostable
+    public class ImgurAccountSettings : IUrlFormatable
     {
         /// <summary>
         /// Gets or sets the user email address.
@@ -68,6 +68,18 @@ namespace ImgurDotNetSDK
             /// Gets or sets the Url of the blocked user.
             /// </summary>
             public string BlockedUrl { get; set; }
+        }
+
+        /// <inheritdoc />
+        public string MultiWordDelimeter()
+        {
+            return "_";
+        }
+
+        /// <inheritdoc />
+        public bool SplitOnCamelCase()
+        {
+            return true;
         }
     }
 }

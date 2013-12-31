@@ -1,6 +1,6 @@
-﻿namespace DotNetExtensions
+namespace ImgurDotNetSDK
 {
-    public interface IUrlFormatable
+    public partial interface IUrlFormatable
     {
         /// <summary>
         /// Gets the value to use when splitting multiple words.

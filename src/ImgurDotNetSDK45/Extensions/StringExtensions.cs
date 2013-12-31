@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.Linq;
 using JetBrains.Annotations;
 
-namespace DotNetExtensions
+namespace ImgurDotNetSDK
 {
-    public static class StringExtensions
+    internal static partial class StringExtensions
     {
         [StringFormatMethod("format")]
         public static string With(this string @string, params object[] args)

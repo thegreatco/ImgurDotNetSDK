@@ -1,6 +1,6 @@
 ﻿namespace ImgurDotNetSDK
 {
-    public class ImgurAlbumProperties : IPostable
+    public class ImgurAlbumProperties : IUrlFormatable
     {
         /// <summary>
         /// Gets or sets an array of <see cref="ImgurImage"/> ids.
@@ -31,5 +31,17 @@
         /// Gets or sets the <see cref="ImgurImage"/> id of the cover <see cref="ImgurImage"/>.
         /// </summary>
         public string Cover { get; set; }
+
+        /// <inheritdoc />
+        public string MultiWordDelimeter()
+        {
+            return "_";
+        }
+
+        /// <inheritdoc />
+        public bool SplitOnCamelCase()
+        {
+            return true;
+        }
     }
 }
