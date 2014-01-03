@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.Contracts;
 
 namespace ImgurDotNetSDK
 {
@@ -9,8 +10,9 @@ namespace ImgurDotNetSDK
 
         public ImgurSettings(string clientId, string clientSecret)
         {
-            if (string.IsNullOrWhiteSpace(clientId)) throw new ArgumentNullException("clientId", "ClientId cannot be null or empty.");
-            if (string.IsNullOrWhiteSpace(clientSecret)) throw new ArgumentNullException("clientSecret", "ClientSecret cannot be null or empty.");
+            Contract.Requires<ArgumentNullException>(!string.IsNullOrWhiteSpace(clientId), "Client Id cannot be null or whitespace.");
+            Contract.Requires<ArgumentNullException>(!string.IsNullOrWhiteSpace(clientSecret), "Client Secret cannot be null or whitespace.");
+            
             ClientId = clientId;
             ClientSecret = clientSecret;
         }

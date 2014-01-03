@@ -30,7 +30,7 @@ namespace ImgurDotNetSDK
         /// <summary>
         /// Gets or sets the epoch time of account creation.
         /// </summary>
-        public long Created { get; set; }
+        public DateTime Created { get; set; }
 
         /// <summary>
         /// Gets or sets the expiration time if the account is a pro user, null otherwise.

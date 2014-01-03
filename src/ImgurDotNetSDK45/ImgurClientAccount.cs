@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -8,7 +9,7 @@ namespace ImgurDotNetSDK
 {
     public partial class ImgurClient
     {
-        private string _deleteKey = Guid.NewGuid().ToString("N");
+        public string DeleteKey = Guid.NewGuid().ToString("N");
 
         /// <summary>
         /// Get the Account Base data. <see href="https://api.imgur.com/endpoints/account#account"/>
@@ -17,11 +18,11 @@ namespace ImgurDotNetSDK
         /// <returns> An <see cref="ImgurAccount"/>. </returns>
         public async Task<ImgurAccount> AccountBase(string username = "me")
         {
-            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentNullException("username", "The username cannot be null.");
+            Contract.Requires<ArgumentNullException>(!string.IsNullOrWhiteSpace(username), "Username cannot be null or whitespace.");
 
             var uri = "https://api.imgur.com/3/account/{0}".ToUri(username);
             var model = await Get<DTO.AccountResponse>(uri, HttpMethod.Get);
-            return Mapper.Map<DTO.AccountResponse, ImgurAccount>(model);
+            return Mapper.Map<DTO.AccountResponseEntity, ImgurAccount>(model.Entity);
         }
 
         /// <summary>
@@ -31,20 +32,11 @@ namespace ImgurDotNetSDK
         /// <returns> An <see cref="ImgurAccount"/>. </returns>
         public async Task<ImgurAccount> CreateAccount(string username = "me")
         {
-            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentNullException("username", "The username cannot be null.");
+            Contract.Requires<ArgumentNullException>(!string.IsNullOrWhiteSpace(username), "Username cannot be null or whitespace.");
 
             var uri = "https://api.imgur.com/3/account/{0}".ToUri(username);
             var model = await Get<DTO.AccountResponse>(uri, HttpMethod.Post);
             return Mapper.Map<DTO.AccountResponse, ImgurAccount>(model);
-        }
-
-        /// <summary>
-        /// Call this method to get a key required to ensure an account isn't accidentally deleted.
-        /// </summary>
-        /// <returns> The delete key for DeleteAccount.</returns>
-        public string RequestDeleteKey()
-        {
-            return _deleteKey;
         }
 
         /// <summary>
@@ -55,11 +47,11 @@ namespace ImgurDotNetSDK
         /// <returns> An <see cref="ImgurBasic"/> response.  Check the returned object for success of operation. </returns>
         public async Task<ImgurBasic> DeleteAccount(string requestKey, string username = "me")
         {
-            if (requestKey != _deleteKey) throw new ArgumentException("Request key does not match the delete key, this is so you don't accidentally delete an account.", "requestKey");
-            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentNullException("username", "The username cannot be null.");
+            Contract.Requires<ArgumentException>(requestKey != DeleteKey, "Request key does not match the delete key, this is so you don't accidentally delete an account.");
+            Contract.Requires<ArgumentNullException>(!string.IsNullOrWhiteSpace(username), "Username cannot be null or whitespace.");
 
             // Once the key is used, change it.
-            _deleteKey = Guid.NewGuid().ToString("N");
+            DeleteKey = Guid.NewGuid().ToString("N");
 
             var uri = "https://api.imgur.com/3/account/{0}".ToUri(username);
             var model = await Get<DTO.BasicResponse>(uri, HttpMethod.Delete);
@@ -73,7 +65,7 @@ namespace ImgurDotNetSDK
         /// <returns> An array of <see cref="ImgurImage"/> containing all the favorites. </returns>
         public async Task<ImgurImage[]> AccountGalleryFavorites(string username = "me")
         {
-            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentNullException("username", "The username cannot be null.");
+            Contract.Requires<ArgumentNullException>(!string.IsNullOrWhiteSpace(username), "Username cannot be null or whitespace.");
 
             var uri = "https://api.imgur.com/3/account/{0}/gallery_favorites".ToUri(username);
             var model = await Get<DTO.ImagesResponse>(uri, HttpMethod.Get);
@@ -87,7 +79,7 @@ namespace ImgurDotNetSDK
         /// <returns> An array of <see cref="ImgurGallery"/> containing all the favorites. </returns>
         public async Task<ImgurGallery[]> AccountFavorites(string username = "me")
         {
-            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentNullException("username", "The username cannot be null.");
+            Contract.Requires<ArgumentNullException>(!string.IsNullOrWhiteSpace(username), "Username cannot be null or whitespace.");
 
             var uri = "https://api.imgur.com/3/account/{0}/favorites".ToUri(username);
             var model = await Get<DTO.GalleryResponse>(uri, HttpMethod.Get);
@@ -102,7 +94,7 @@ namespace ImgurDotNetSDK
         /// <returns> An array of <see cref="ImgurGallery"/> containing all the favorites. </returns>
         public async Task<ImgurGallery[]> AccountSubmissions(string username = "me", int page = 0)
         {
-            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentNullException("username", "The username cannot be null.");
+            Contract.Requires<ArgumentNullException>(!string.IsNullOrWhiteSpace(username), "Username cannot be null or whitespace.");
 
             var uri = "https://api.imgur.com/3/account/{0}/submissions/{0}".ToUri(username, page);
             var model = await Get<DTO.GalleryResponse>(uri, HttpMethod.Get);
@@ -116,7 +108,7 @@ namespace ImgurDotNetSDK
         /// <returns> A <see cref="ImgurAccountSettings"/>. </returns>
         public async Task<ImgurAccountSettings> AccountSettings(string username = "me")
         {
-            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentNullException("username", "The username cannot be null.");
+            Contract.Requires<ArgumentNullException>(!string.IsNullOrWhiteSpace(username), "Username cannot be null or whitespace.");
 
             var uri = "https://api.imgur.com/3/account/{0}/settings".ToUri(username);
             var model = await Get<DTO.AccountSettingsResponse>(uri, HttpMethod.Get);
@@ -131,7 +123,7 @@ namespace ImgurDotNetSDK
         /// <returns> A <see cref="ImgurBasic"/> indicating the success of the operation. </returns>
         public async Task<ImgurBasic> ChangeAccountSettings(ImgurAccountSettings settings, string username = "me")
         {
-            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentNullException("username", "The username cannot be null.");
+            Contract.Requires<ArgumentNullException>(!string.IsNullOrWhiteSpace(username), "Username cannot be null or whitespace.");
 
             var uri = "https://api.imgur.com/3/account/{0}/settings".With(username).ToUri(settings);
             var model = await Get<DTO.BasicResponse>(uri, HttpMethod.Post);
@@ -140,7 +132,7 @@ namespace ImgurDotNetSDK
 
         public async Task<ImgurAccountStatistics> AccountStatistics(string username = "me")
         {
-            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentNullException("username", "The username cannot be null.");
+            Contract.Requires<ArgumentNullException>(!string.IsNullOrWhiteSpace(username), "Username cannot be null or whitespace.");
 
             var uri = "https://api.imgur.com/3/account/{0}/stats".ToUri(username);
             var model = await Get<DTO.AccountStatisticsResponse>(uri, HttpMethod.Get);
@@ -149,7 +141,7 @@ namespace ImgurDotNetSDK
 
         public async Task<ImgurGalleryProfile> AccountGalleryProfile(string username = "me")
         {
-            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentNullException("username", "The username cannot be null.");
+            Contract.Requires<ArgumentNullException>(!string.IsNullOrWhiteSpace(username), "Username cannot be null or whitespace.");
 
             var uri = "https://api.imgur.com/3/account/{0}/gallery_profile".ToUri(username);
             var model = await Get<DTO.GalleryProfileResponse>(uri, HttpMethod.Get);
@@ -158,7 +150,7 @@ namespace ImgurDotNetSDK
 
         public async Task<bool> VerifyUsersEmail(string username = "me")
         {
-            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentNullException("username", "The username cannot be null.");
+            Contract.Requires<ArgumentNullException>(!string.IsNullOrWhiteSpace(username), "Username cannot be null or whitespace.");
 
             var uri = "https://api.imgur.com/3/account/{0}/verifyemail".ToUri(username);
             var model = await Get<DTO.TrueFalseResponse>(uri, HttpMethod.Get);
@@ -167,7 +159,7 @@ namespace ImgurDotNetSDK
 
         public async Task<bool> SendVerificationEmail(string username = "me")
         {
-            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentNullException("username", "The username cannot be null.");
+            Contract.Requires<ArgumentNullException>(!string.IsNullOrWhiteSpace(username), "Username cannot be null or whitespace.");
 
             var uri = "https://api.imgur.com/3/account/{0}/verifyemail".ToUri(username);
             var model = await Get<DTO.TrueFalseResponse>(uri, HttpMethod.Post);
@@ -176,7 +168,7 @@ namespace ImgurDotNetSDK
 
         public async Task<ImgurAlbum[]> Albums(string username = "me", int page = 0)
         {
-            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentNullException("username", "The username cannot be null.");
+            Contract.Requires<ArgumentNullException>(!string.IsNullOrWhiteSpace(username), "Username cannot be null or whitespace.");
 
             var uri = "https://api.imgur.com/3/account/{0}/albums/{1}".ToUri(username, page);
             var model = await Get<DTO.AlbumsResponse>(uri, HttpMethod.Get);
@@ -186,7 +178,7 @@ namespace ImgurDotNetSDK
         /*
         public async Task<ImgurAlbum> Album(string albumId, string username = "me")
         {
-            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentNullException("username", "The username cannot be null.");
+            Contract.Requires<ArgumentNullException>(!string.IsNullOrWhiteSpace(username), "Username cannot be null or whitespace.");
             
             var uri = "https://api.imgur.com/3/account/{0}/album/{1}".ToUri(username, albumId);
             var model = await Get<DTO.AlbumResponse>(uri, HttpMethod.Get);
@@ -196,7 +188,7 @@ namespace ImgurDotNetSDK
 
         public async Task<ImgurAlbumIds> AlbumIds(string username = "me")
         {
-            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentNullException("username", "The username cannot be null.");
+            Contract.Requires<ArgumentNullException>(!string.IsNullOrWhiteSpace(username), "Username cannot be null or whitespace.");
 
             var uri = "https://api.imgur.com/3/account/{0}/albums/ids".ToUri(username);
             var model = await Get<DTO.AlbumIdsResponse>(uri, HttpMethod.Get);
@@ -205,7 +197,7 @@ namespace ImgurDotNetSDK
 
         public async Task<long> AlbumCount(string username = "me")
         {
-            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentNullException("username", "The username cannot be null.");
+            Contract.Requires<ArgumentNullException>(!string.IsNullOrWhiteSpace(username), "Username cannot be null or whitespace.");
 
             var uri = "https://api.imgur.com/3/account/{0}/albums/ids".ToUri(username);
             var model = await Get<DTO.AlbumCountResponse>(uri, HttpMethod.Get);
@@ -215,7 +207,7 @@ namespace ImgurDotNetSDK
         /*
         public async Task<bool> DeleteAlbum(string albumId, string username = "me")
         {
-            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentNullException("username", "The username cannot be null.");
+            Contract.Requires<ArgumentNullException>(!string.IsNullOrWhiteSpace(username), "Username cannot be null or whitespace.");
             
             var uri = "https://api.imgur.com/3/account/{0}/albums/{1}".ToUri(username, albumId);
             var model = await Get<DTO.TrueFalseResponse>(uri, HttpMethod.Delete);
@@ -225,7 +217,7 @@ namespace ImgurDotNetSDK
 
         public async Task<ImgurComment[]> Comments(string username = "me")
         {
-            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentNullException("username", "The username cannot be null.");
+            Contract.Requires<ArgumentNullException>(!string.IsNullOrWhiteSpace(username), "Username cannot be null or whitespace.");
 
             var uri = "https://api.imgur.com/3/account/{0}/comments".ToUri(username);
             var model = await Get<DTO.CommentsResponse>(uri, HttpMethod.Get);
@@ -234,7 +226,7 @@ namespace ImgurDotNetSDK
 
         public async Task<ImgurComment> Comment(string commentId, string username = "me")
         {
-            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentNullException("username", "The username cannot be null.");
+            Contract.Requires<ArgumentNullException>(!string.IsNullOrWhiteSpace(username), "Username cannot be null or whitespace.");
 
             var uri = "https://api.imgur.com/3/account/{0}/comment/{1}".ToUri(username, commentId);
             var model = await Get<DTO.CommentResponse>(uri, HttpMethod.Get);
@@ -243,7 +235,7 @@ namespace ImgurDotNetSDK
 
         public async Task<string[]> CommentIds(string username = "me")
         {
-            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentNullException("username", "The username cannot be null.");
+            Contract.Requires<ArgumentNullException>(!string.IsNullOrWhiteSpace(username), "Username cannot be null or whitespace.");
 
             var uri = "https://api.imgur.com/3/account/{0}/comments/ids".ToUri(username);
             var model = await Get<DTO.CommentIdsResponse>(uri, HttpMethod.Get);
@@ -252,7 +244,7 @@ namespace ImgurDotNetSDK
 
         public async Task<long> CommentCount(string username = "me")
         {
-            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentNullException("username", "The username cannot be null.");
+            Contract.Requires<ArgumentNullException>(!string.IsNullOrWhiteSpace(username), "Username cannot be null or whitespace.");
 
             var uri = "https://api.imgur.com/3/account/{0}/comments/count".ToUri(username);
             var model = await Get<DTO.CommentCountResponse>(uri, HttpMethod.Get);
@@ -261,7 +253,7 @@ namespace ImgurDotNetSDK
 
         public async Task<bool> DeleteComment(string commentId, string username = "me")
         {
-            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentNullException("username", "The username cannot be null.");
+            Contract.Requires<ArgumentNullException>(!string.IsNullOrWhiteSpace(username), "Username cannot be null or whitespace.");
 
             var uri = "https://api.imgur.com/3/account/{0}/comment/{1}".ToUri(username, commentId);
             var model = await Get<DTO.TrueFalseResponse>(uri, HttpMethod.Delete);
@@ -270,7 +262,7 @@ namespace ImgurDotNetSDK
 
         public async Task<ImgurImage[]> Images(string username = "me", int page = 0)
         {
-            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentNullException("username", "The username cannot be null.");
+            Contract.Requires<ArgumentNullException>(!string.IsNullOrWhiteSpace(username), "Username cannot be null or whitespace.");
 
             var uri = "https://api.imgur.com/3/account/{0}/albums/{1}".ToUri(username, page);
             var model = await Get<DTO.ImagesResponse>(uri, HttpMethod.Get);
@@ -279,7 +271,7 @@ namespace ImgurDotNetSDK
 
         public async Task<ImgurImage> Image(string imageId = null, string username = "me")
         {
-            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentNullException("username", "The username cannot be null.");
+            Contract.Requires<ArgumentNullException>(!string.IsNullOrWhiteSpace(username), "Username cannot be null or whitespace.");
 
             var uri = "https://api.imgur.com/3/account/{0}/image/{1}".ToUri(username, imageId);
             var model = await Get<DTO.ImageResponse>(uri, HttpMethod.Get);
@@ -288,7 +280,7 @@ namespace ImgurDotNetSDK
 
         public async Task<string[]> ImageIds(string username = "me")
         {
-            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentNullException("username", "The username cannot be null.");
+            Contract.Requires<ArgumentNullException>(!string.IsNullOrWhiteSpace(username), "Username cannot be null or whitespace.");
 
             var uri = "https://api.imgur.com/3/account/{0}/images/ids".ToUri(username);
             var model = await Get<DTO.ImageIdsResponse>(uri, HttpMethod.Get);
@@ -297,7 +289,7 @@ namespace ImgurDotNetSDK
 
         public async Task<long> ImageCount(string username = "me")
         {
-            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentNullException("username", "The username cannot be null.");
+            Contract.Requires<ArgumentNullException>(!string.IsNullOrWhiteSpace(username), "Username cannot be null or whitespace.");
 
             var uri = "https://api.imgur.com/3/account/{0}/images/count".ToUri(username);
             var model = await Get<DTO.ImageCountResponse>(uri, HttpMethod.Get);
@@ -306,7 +298,7 @@ namespace ImgurDotNetSDK
         
         public async Task<bool> DeleteImage(string deleteHash, string username = "me")
         {
-            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentNullException("username", "The username cannot be null.");
+            Contract.Requires<ArgumentNullException>(!string.IsNullOrWhiteSpace(username), "Username cannot be null or whitespace.");
 
             var uri = "https://api.imgur.com/3/account/{0}/images/{1}".ToUri(username, deleteHash);
             var model = await Get<DTO.TrueFalseResponse>(uri, HttpMethod.Delete);
@@ -315,7 +307,7 @@ namespace ImgurDotNetSDK
 
         public async Task<ImgurNotification> Replies(bool newNotificationsOnly, string username = "me")
         {
-            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentNullException("username", "The username cannot be null.");
+            Contract.Requires<ArgumentNullException>(!string.IsNullOrWhiteSpace(username), "Username cannot be null or whitespace.");
 
             var uri = "https://api.imgur.com/3/account/{0}/notifications/replies?new={1}".ToUri(username, newNotificationsOnly);
             var model = await Get<DTO.NotificationsResponse>(uri, HttpMethod.Get);

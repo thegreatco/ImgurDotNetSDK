@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -24,7 +25,7 @@ namespace ImgurDotNetSDK
 
         private readonly ImgurSettings _settings;
 
-        private ImgurCredentials _credentials;
+        public ImgurCredentials Credentials { get; private set; }
 
         /// <summary>
         /// Creates a new instance of <see cref="ImgurClient"/> with the supplied settings.
@@ -32,7 +33,7 @@ namespace ImgurDotNetSDK
         /// <param name="settings"> The <see cref="ImgurSettings"/> to use for the new client. </param>
         public ImgurClient(ImgurSettings settings)
         {
-            if (settings == null) throw new ArgumentNullException("settings", "Settings cannot be null.");
+            Contract.Requires<ArgumentNullException>(settings != null, "Settings cannot be null.");
             _settings = settings;
 
             Mapper.CreateMap<DTO.MessageEntity, ImgurMessage>();
@@ -56,7 +57,7 @@ namespace ImgurDotNetSDK
                 .ForMember(x => x.Timestamp, y => y.ResolveUsing(x => x.Timestamp.FromUnixTime()));
             Mapper.CreateMap<DTO.GalleryEntity, ImgurGallery>()
                 .ForMember(x => x.Timestamp, y => y.ResolveUsing(x => x.Timestamp.FromUnixTime()));
-            Mapper.CreateMap<DTO.AccountResponse, ImgurAccount>()
+            Mapper.CreateMap<DTO.AccountResponseEntity, ImgurAccount>()
                 .ForMember(x => x.Created, y => y.ResolveUsing(x => x.Created.FromUnixTime()))
                 .ForMember(x => x.ProExpiration, y => y.ResolveUsing(x =>
                                                                      {
@@ -74,7 +75,9 @@ namespace ImgurDotNetSDK
         /// <param name="credentials"> The <see cref="ImgurCredentials"/> to use for the user if they have already been obtained. </param>
         public ImgurClient(ImgurSettings settings, ImgurCredentials credentials) : this(settings)
         {
-            _credentials = credentials;
+            Contract.Requires<ArgumentNullException>(credentials != null, "Credentials cannot be null.");
+
+            Credentials = credentials;
         }
 
         /// <summary>
@@ -104,7 +107,7 @@ namespace ImgurDotNetSDK
                                                             });
             var response = await Get<DTO.LoginResponse>(TokenRequestUrl, HttpMethod.Post, postContent);
             if (response == null) throw new Exception("Login Failed.");
-            _credentials = new ImgurCredentials(response.AccessToken, response.RefreshToken, response.ExpiresIn);
+            Credentials = new ImgurCredentials(response.AccessToken, response.RefreshToken, response.ExpiresIn);
         }
 
         /// <summary>
@@ -113,17 +116,18 @@ namespace ImgurDotNetSDK
         /// <returns> A task for asynchronous waiting. </returns>
         public async Task RefreshLogin()
         {
-            if (string.IsNullOrWhiteSpace(_credentials.RefreshToken)) throw new ArgumentException("Refresh Token cannot be null.");
+            Contract.Requires<Exception>(!string.IsNullOrWhiteSpace(Credentials.RefreshToken), "Refresh Token cannot be null.");
+            
             var postContent = new FormUrlEncodedContent(new[]
                                                             {
-                                                                new KeyValuePair<string, string>("refresh_token", _credentials.RefreshToken),
+                                                                new KeyValuePair<string, string>("refresh_token", Credentials.RefreshToken),
                                                                 new KeyValuePair<string, string>("client_id", _settings.ClientId),
                                                                 new KeyValuePair<string, string>("client_secret", _settings.ClientSecret),
                                                                 new KeyValuePair<string, string>("grant_type", "refresh_token")
                                                             });
             var response = await Get<DTO.LoginResponse>(TokenRequestUrl, HttpMethod.Post, postContent);
             if (response == null) throw new Exception("Login Failed.");
-            _credentials = new ImgurCredentials(response.AccessToken, response.RefreshToken, response.ExpiresIn);
+            Credentials = new ImgurCredentials(response.AccessToken, response.RefreshToken, response.ExpiresIn);
         }
 
         /// <summary>
@@ -195,12 +199,12 @@ namespace ImgurDotNetSDK
 
         private async Task<T> Get<T>(Uri requestUri, HttpMethod httpMethod, HttpContent postData = null, int retryCount = 0) where T : class
         {
-            if (retryCount > 5) throw new Exception("Retry count exceeded.");
+            Contract.Requires<RetryException>(retryCount < 5);
 
             using (var request = new HttpRequestMessage(httpMethod, requestUri) {Content = postData})
             {
-                if (_credentials != null)
-                    request.Headers.TryAddWithoutValidation("Authorization", "Bearer " + _credentials.AccessToken);
+                if (Credentials != null)
+                    request.Headers.TryAddWithoutValidation("Authorization", "Bearer " + Credentials.AccessToken);
                 using (var response = await StaticHttpClient.Client.SendAsync(request))
                 {
                     if (response.IsSuccessStatusCode)
@@ -226,12 +230,12 @@ namespace ImgurDotNetSDK
 
         public async Task<string> Get(Uri requestUri, HttpMethod httpMethod, HttpContent postData = null, int retryCount = 0)
         {
-            if (retryCount > 5) throw new Exception("Retry count exceeded.");
+            Contract.Requires<RetryException>(retryCount < 5);
             
             using (var request = new HttpRequestMessage(httpMethod, requestUri) { Content = postData })
             {
-                if (_credentials != null)
-                    request.Headers.TryAddWithoutValidation("Authorization", "Bearer " + _credentials.AccessToken);
+                if (Credentials != null)
+                    request.Headers.TryAddWithoutValidation("Authorization", "Bearer " + Credentials.AccessToken);
                 using (var response = await StaticHttpClient.Client.SendAsync(request))
                 {
                     if (response.IsSuccessStatusCode)
@@ -262,12 +266,12 @@ namespace ImgurDotNetSDK
 
         private async Task<byte[]> GetImage(Uri requestUri, int retryCount = 0)
         {
-            if (retryCount > 5) throw new Exception("Retry count exceeded.");
+            Contract.Requires<RetryException>(retryCount < 5);
 
             using (var request = new HttpRequestMessage(HttpMethod.Get, requestUri))
             {
-                if (_credentials != null)
-                    request.Headers.TryAddWithoutValidation("Authorization", "Bearer " + _credentials.AccessToken);
+                if (Credentials != null)
+                    request.Headers.TryAddWithoutValidation("Authorization", "Bearer " + Credentials.AccessToken);
                 using (var response = await StaticHttpClient.Client.SendAsync(request))
                 {
                     if (response.IsSuccessStatusCode)

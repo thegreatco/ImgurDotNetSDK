@@ -7,7 +7,7 @@ using System.Text;
 namespace ImgurDotNetSDK.DTO
 {
     [DataContract]
-    internal class BasicResponse
+    public class BasicResponse
     {
         [DataMember(Name = "success")]
         public bool Success { get; set; }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.Contracts;
 using System.Net.Http;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -9,7 +10,8 @@ namespace ImgurDotNetSDK
     {
         public async Task<ImgurAlbum> Album(string albumId)
         {
-            if (string.IsNullOrWhiteSpace(albumId)) throw new ArgumentNullException("albumId", "Album Id cannot be null or whitespace.");
+            Contract.Requires<ArgumentNullException>(!string.IsNullOrWhiteSpace(albumId), "AlbumId cannot be null or whitespace.");
+            Contract.Requires<ArgumentNullException>(!string.IsNullOrWhiteSpace(albumId), "AlbumId cannot be null or whitespace.");
 
             var uri = "https://api.imgur.com/3/album/{0}".ToUri(albumId);
             var model = await Get<DTO.AlbumResponse>(uri, HttpMethod.Get);
@@ -18,7 +20,7 @@ namespace ImgurDotNetSDK
 
         public async Task<ImgurImage[]> AlbumImages(string albumId)
         {
-            if (string.IsNullOrWhiteSpace(albumId)) throw new ArgumentNullException("albumId", "Album Id cannot be null or whitespace.");
+            Contract.Requires<ArgumentNullException>(!string.IsNullOrWhiteSpace(albumId), "AlbumId cannot be null or whitespace.");
 
             var uri = "https://api.imgur.com/3/album/{0}/images".ToUri(albumId);
             var model = await Get<DTO.ImagesResponse>(uri, HttpMethod.Get);
@@ -27,8 +29,8 @@ namespace ImgurDotNetSDK
 
         public async Task<ImgurAlbumIds> AlbumImage(string albumId, string imageId)
         {
-            if (string.IsNullOrWhiteSpace(albumId)) throw new ArgumentNullException("albumId", "The Album Id cannot be null.");
-            if (string.IsNullOrWhiteSpace(imageId)) throw new ArgumentNullException("imageId", "The Image Id cannot be null.");
+            Contract.Requires<ArgumentNullException>(!string.IsNullOrWhiteSpace(albumId), "AlbumId cannot be null or whitespace.");
+            Contract.Requires<ArgumentNullException>(!string.IsNullOrWhiteSpace(imageId), "ImageId cannot be null or whitespace.");
 
             var uri = "https://api.imgur.com/3/album/{0}/image/{1}".ToUri(albumId, imageId);
             var model = await Get<DTO.AlbumIdsResponse>(uri, HttpMethod.Get);
@@ -37,6 +39,8 @@ namespace ImgurDotNetSDK
 
         public async Task<ImgurAlbum> CreateAlbum(ImgurAlbumProperties albumProps)
         {
+            Contract.Requires<ArgumentNullException>(albumProps != null, "Album Properties cannot be null.");
+
             var uri = "https://api.imgur.com/3/album".ToUri(albumProps);
             var model = await Get<DTO.CreateAlbumResponse>(uri, HttpMethod.Post);
             return Mapper.Map<DTO.CreateAlbumEntity, ImgurAlbum>(model.Entity);
@@ -50,7 +54,7 @@ namespace ImgurDotNetSDK
 
         public async Task<ImgurAlbum> UpdateAlbum(string albumId, ImgurAlbumProperties albumProps)
         {
-            if (string.IsNullOrWhiteSpace(albumId)) throw new ArgumentNullException("albumId", "The Album Id cannot be null.");
+            Contract.Requires<ArgumentNullException>(!string.IsNullOrWhiteSpace(albumId), "AlbumId cannot be null or whitespace.");
 
             var uri = "https://api.imgur.com/3/album".ToUri(albumProps);
             var model = await Get<DTO.CreateAlbumResponse>(uri, HttpMethod.Post);
@@ -59,7 +63,7 @@ namespace ImgurDotNetSDK
 
         public async Task<bool> DeleteAlbum(string albumId)
         {
-            if (string.IsNullOrWhiteSpace(albumId)) throw new ArgumentNullException("albumId", "The Album Id cannot be null.");
+            Contract.Requires<ArgumentNullException>(!string.IsNullOrWhiteSpace(albumId), "AlbumId cannot be null or whitespace.");
 
             var uri = "https://api.imgur.com/3/album/{0}".ToUri(albumId);
             var model = await Get<DTO.TrueFalseResponse>(uri, HttpMethod.Delete);
@@ -68,7 +72,7 @@ namespace ImgurDotNetSDK
 
         public async Task<bool> FavoriteAlbum(string albumId)
         {
-            if (string.IsNullOrWhiteSpace(albumId)) throw new ArgumentNullException("albumId", "The Album Id cannot be null.");
+            Contract.Requires<ArgumentNullException>(!string.IsNullOrWhiteSpace(albumId), "AlbumId cannot be null or whitespace.");
 
             var uri = "https://api.imgur.com/3/album/{0}/favorite".ToUri(albumId);
             var model = await Get<DTO.TrueFalseResponse>(uri, HttpMethod.Post);
@@ -77,16 +81,18 @@ namespace ImgurDotNetSDK
 
         public async Task<ImgurAlbum> SetAlbumImages(string albumId, string[] ids)
         {
-            if (string.IsNullOrWhiteSpace(albumId)) throw new ArgumentNullException("albumId", "The Album Id cannot be null.");
-            if (ids == null) throw new ArgumentNullException("ids", "The list of picture Ids cannot be null.");
+            Contract.Requires<ArgumentNullException>(!string.IsNullOrWhiteSpace(albumId), "AlbumId cannot be null or whitespace.");
+            Contract.Requires<ArgumentNullException>(ids != null, "ImageIds array cannot be null.");
+            Contract.Requires<ArgumentNullException>(Contract.ForAll(ids, x => !string.IsNullOrWhiteSpace(x)), "ImageId cannot be null or whitespace.");
 
             return await UpdateAlbum(albumId, new ImgurAlbumProperties { Ids = ids });
         }
 
         public async Task<ImgurAlbum> AddAlbumImages(string albumId, string[] ids)
         {
-            if (string.IsNullOrWhiteSpace(albumId)) throw new ArgumentNullException("albumId", "The Album Id cannot be null.");
-            if (ids == null) throw new ArgumentNullException("ids", "The list of picture Ids cannot be null.");
+            Contract.Requires<ArgumentNullException>(!string.IsNullOrWhiteSpace(albumId), "AlbumId cannot be null or whitespace.");
+            Contract.Requires<ArgumentNullException>(ids != null, "ImageIds array cannot be null.");
+            Contract.Requires<ArgumentNullException>(Contract.ForAll(ids, x => !string.IsNullOrWhiteSpace(x)), "ImageId cannot be null or whitespace.");
 
             var albumProps = new ImgurAlbumProperties { Ids = ids };
             var uri = "https://api.imgur.com/3/album/{0}/add".ToUri(albumProps, albumId);
@@ -96,8 +102,9 @@ namespace ImgurDotNetSDK
 
         public async Task<ImgurAlbum> RemoveAlbumImages(string albumId, string[] ids)
         {
-            if (string.IsNullOrWhiteSpace(albumId)) throw new ArgumentNullException("albumId", "The Album Id cannot be null.");
-            if (ids == null) throw new ArgumentNullException("ids", "The list of picture Ids cannot be null.");
+            Contract.Requires<ArgumentNullException>(!string.IsNullOrWhiteSpace(albumId), "AlbumId cannot be null or whitespace.");
+            Contract.Requires<ArgumentNullException>(ids != null, "ImageIds array cannot be null.");
+            Contract.Requires<ArgumentNullException>(Contract.ForAll(ids, x => !string.IsNullOrWhiteSpace(x)), "ImageId cannot be null or whitespace.");
 
             var albumProps = new ImgurAlbumProperties { Ids = ids };
             var uri = "https://api.imgur.com/3/album/{0}/remove_images".ToUri(albumProps, albumId);

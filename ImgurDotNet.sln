@@ -14,6 +14,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{1C6864
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImgurDotNetSDK45", "src\ImgurDotNetSDK45\ImgurDotNetSDK45.csproj", "{2FE1A949-760F-4541-B081-17AB53CBE0AF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImgurDotNetSDK40.Tests", "src\ImgurDotNetSDK40.Tests\ImgurDotNetSDK40.Tests.csproj", "{CC9DF22F-1AEE-49E7-B9BA-E0DE33BA6B43}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImgurDotNetSDK45.Tests", "src\ImgurDotNetSDK45.Tests\ImgurDotNetSDK45.Tests.csproj", "{44A61F2C-7973-48A2-9287-FCBF106E24CE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -28,6 +32,14 @@ Global
 		{2FE1A949-760F-4541-B081-17AB53CBE0AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2FE1A949-760F-4541-B081-17AB53CBE0AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2FE1A949-760F-4541-B081-17AB53CBE0AF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CC9DF22F-1AEE-49E7-B9BA-E0DE33BA6B43}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC9DF22F-1AEE-49E7-B9BA-E0DE33BA6B43}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC9DF22F-1AEE-49E7-B9BA-E0DE33BA6B43}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC9DF22F-1AEE-49E7-B9BA-E0DE33BA6B43}.Release|Any CPU.Build.0 = Release|Any CPU
+		{44A61F2C-7973-48A2-9287-FCBF106E24CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44A61F2C-7973-48A2-9287-FCBF106E24CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{44A61F2C-7973-48A2-9287-FCBF106E24CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{44A61F2C-7973-48A2-9287-FCBF106E24CE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

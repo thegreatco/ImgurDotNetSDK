@@ -1,0 +1,11 @@
+﻿using ImgurDotNetSDK;
+
+namespace ImgurDotNetSDK45.Tests
+{
+    internal static class TestSettings
+    {
+        public static ImgurSettings Settings = new ImgurSettings();
+
+        public static ImgurCredentials Credentials = new ImgurCredentials();
+    }
+}

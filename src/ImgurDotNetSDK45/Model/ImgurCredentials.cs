@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Text;
 
@@ -15,9 +16,9 @@ namespace ImgurDotNetSDK
 
         public ImgurCredentials(string accessToken, string refreshToken, long expiresIn)
         {
-            if (string.IsNullOrWhiteSpace(accessToken)) throw new ArgumentNullException("accessToken", "Access Token cannot be null.");
-            if (string.IsNullOrWhiteSpace(refreshToken)) throw new ArgumentNullException("refreshToken", "Refresh Token cannot be null.");
-            if (expiresIn == default(long)) throw new ArgumentException("Expiration time is invalid.");
+            Contract.Requires<ArgumentNullException>(!string.IsNullOrWhiteSpace(accessToken), "Access Token cannot be null or whitespace.");
+            Contract.Requires<ArgumentNullException>(!string.IsNullOrWhiteSpace(refreshToken), "Refresh Token cannot be null or whitespace.");
+            Contract.Requires<ArgumentException>(expiresIn != default(long), "Expiration time is invalid.");
             
             AccessToken = accessToken;
             RefreshToken = refreshToken;

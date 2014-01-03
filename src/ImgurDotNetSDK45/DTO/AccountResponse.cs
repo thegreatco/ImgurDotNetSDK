@@ -1,27 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Serialization;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace ImgurDotNetSDK.DTO
 {
     [DataContract]
-    internal class AccountResponse
+    public class AccountResponse : BasicResponse
     {
-        [DataMember(Name = "id")]
-        public long Id { get; set; }
-
-        [DataMember(Name = "url")]
-        public string Url { get; set; }
-
-        [DataMember(Name = "bio")]
-        public string Bio { get; set; }
-
-        [DataMember(Name = "reputation")]
-        public double Reputation { get; set; }
-
-        [DataMember(Name = "created")]
-        public long Created { get; set; }
-
-        [DataMember(Name = "pro_expiration")]
-        public string ProExpiration { get; set; }
+        [DataMember(Name = "data")]
+        public AccountResponseEntity Entity { get; set; }
     }
 }
