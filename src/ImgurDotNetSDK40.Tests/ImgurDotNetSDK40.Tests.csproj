@@ -55,11 +55,34 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="UnitTest1.cs" />
+    <Compile Include="..\ImgurDotNetSDK45.Tests\ImgurClientAccountTests.cs">
+      <Link>ImgurClientAccountTests.cs</Link>
+    </Compile>
+    <Compile Include="..\ImgurDotNetSDK45.Tests\ImgurClientTests.cs">
+      <Link>ImgurClientTests.cs</Link>
+    </Compile>
+    <Compile Include="..\ImgurDotNetSDK45.Tests\ImgurCredentialsTests.cs">
+      <Link>ImgurCredentialsTests.cs</Link>
+    </Compile>
+    <Compile Include="..\ImgurDotNetSDK45.Tests\ImgurSettingsTests.cs">
+      <Link>ImgurSettingsTests.cs</Link>
+    </Compile>
+    <Compile Include="..\ImgurDotNetSDK45.Tests\TestSettings.cs">
+      <Link>TestSettings.cs</Link>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\ImgurDotNetSDK45.Tests\TestSettings.cs.template">
+      <Link>TestSettings.cs.template</Link>
+    </None>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ImgurDotNetSDK40\ImgurDotNetSDK40.csproj">
+      <Project>{0a33be8a-fbf0-4ac2-9e03-00798f17a561}</Project>
+      <Name>ImgurDotNetSDK40</Name>
+    </ProjectReference>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
