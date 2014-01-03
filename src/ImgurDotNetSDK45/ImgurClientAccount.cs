@@ -30,13 +30,13 @@ namespace ImgurDotNetSDK
         /// </summary>
         /// <param name="username"> The username of the account to create. </param>
         /// <returns> An <see cref="ImgurAccount"/>. </returns>
-        public async Task<ImgurAccount> CreateAccount(string username = "me")
+        public async Task<ImgurAccount> CreateAccount(string username)
         {
             Contract.Requires<ArgumentNullException>(!string.IsNullOrWhiteSpace(username), "Username cannot be null or whitespace.");
 
             var uri = "https://api.imgur.com/3/account/{0}".ToUri(username);
             var model = await Get<DTO.AccountResponse>(uri, HttpMethod.Post);
-            return Mapper.Map<DTO.AccountResponse, ImgurAccount>(model);
+            return Mapper.Map<DTO.AccountResponseEntity, ImgurAccount>(model.Entity);
         }
 
         /// <summary>

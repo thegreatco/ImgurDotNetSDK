@@ -28,6 +28,17 @@ namespace ImgurDotNetSDK
         public ImgurCredentials Credentials { get; private set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the client is being debugged.
+        /// This should be used when actual requests to the Imgur API should be completed using the <see cref="DebugResponse"/> code.
+        /// </summary>
+        public bool DebugMode { get; set; }
+
+        /// <summary>
+        /// Gets or sets the HttpStatus that should be returned by Imgur.
+        /// </summary>
+        public int DebugResponse { get; set; }
+
+        /// <summary>
         /// Creates a new instance of <see cref="ImgurClient"/> with the supplied settings.
         /// </summary>
         /// <param name="settings"> The <see cref="ImgurSettings"/> to use for the new client. </param>
@@ -61,7 +72,7 @@ namespace ImgurDotNetSDK
                 .ForMember(x => x.Created, y => y.ResolveUsing(x => x.Created.FromUnixTime()))
                 .ForMember(x => x.ProExpiration, y => y.ResolveUsing(x =>
                                                                      {
-                                                                         if (x.ProExpiration == "false") return null;
+                                                                         if (string.IsNullOrWhiteSpace(x.ProExpiration) || x.ProExpiration == "false") return null;
                                                                          return long.Parse(x.ProExpiration).FromUnixTime();
                                                                      }));
             Mapper.CreateMap<DTO.BasicResponse, ImgurBasic>()
@@ -199,7 +210,17 @@ namespace ImgurDotNetSDK
 
         private async Task<T> Get<T>(Uri requestUri, HttpMethod httpMethod, HttpContent postData = null, int retryCount = 0) where T : class
         {
+            Contract.Requires<ArgumentNullException>(requestUri != null);
+            Contract.Requires<ArgumentNullException>(httpMethod != null);
             Contract.Requires<RetryException>(retryCount < 5);
+
+            if (DebugMode)
+            {
+                var tmpUri = requestUri.ToString();
+                if (tmpUri.Contains("?")) tmpUri += "&_fake_status={0}".With(DebugResponse);
+                else tmpUri += "?_fake_status={0}".With(DebugResponse);
+                requestUri = new UriBuilder(tmpUri).Uri;
+            }
 
             using (var request = new HttpRequestMessage(httpMethod, requestUri) {Content = postData})
             {
@@ -218,11 +239,12 @@ namespace ImgurDotNetSDK
                             return await Get<T>(requestUri, httpMethod, postData, retryCount + 1);
                         case HttpStatusCode.MethodNotAllowed:
                         case HttpStatusCode.BadGateway:
+                        case HttpStatusCode.InternalServerError:
                             throw new ImgurDownException("Imgur is down, try the request again later.");
                         default:
                             Console.WriteLine(statusCode);
                             Console.WriteLine(response.Content.ReadAsStringAsync().Result);
-                            throw new Exception("Unexpected HttpStatusCode encountered.");
+                            throw new ImgurException("Unexpected HttpStatusCode encountered.");
                     }
                 }
             }
