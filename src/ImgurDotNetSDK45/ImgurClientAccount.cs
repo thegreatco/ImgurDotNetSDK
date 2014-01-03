@@ -45,10 +45,11 @@ namespace ImgurDotNetSDK
         /// <param name="username"> The username of the account to delete. </param>
         /// <param name="requestKey"> This key must be requested via the <see cref="RequestDeleteKey"/> method to prevent accidental account deletion. </param>
         /// <returns> An <see cref="ImgurBasic"/> response.  Check the returned object for success of operation. </returns>
-        public async Task<ImgurBasic> DeleteAccount(string requestKey, string username = "me")
+        public async Task<ImgurBasic> DeleteAccount(string requestKey, string username)
         {
-            Contract.Requires<ArgumentException>(requestKey != DeleteKey, "Request key does not match the delete key, this is so you don't accidentally delete an account.");
+            Contract.Requires<ArgumentNullException>(!string.IsNullOrWhiteSpace(requestKey), "Request Key cannot be null or whitespace.");
             Contract.Requires<ArgumentNullException>(!string.IsNullOrWhiteSpace(username), "Username cannot be null or whitespace.");
+            Contract.Requires<ArgumentException>(requestKey == DeleteKey, "Request key does not match the delete key, this is so you don't accidentally delete an account.");
 
             // Once the key is used, change it.
             DeleteKey = Guid.NewGuid().ToString("N");
